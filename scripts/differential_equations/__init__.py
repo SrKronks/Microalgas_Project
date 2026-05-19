@@ -1,0 +1,2 @@
+"""Differential equation model registry."""
+

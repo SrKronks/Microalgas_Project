@@ -1,0 +1,432 @@
+from __future__ import annotations
+
+import json
+import logging
+import math
+import time
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+from scripts.biological_models.growth_models import get_biological_models
+from scripts.deep_learning.deep_models import get_deep_learning_models
+from scripts.differential_equations.ode_models import get_differential_equation_models
+from scripts.evaluation.interpretability import save_feature_importance, save_shap_status
+from scripts.evaluation.metrics import regression_metrics
+from scripts.forecasting.base import ForecastModel, ModelSkipped
+from scripts.forecasting.classical import get_classical_models
+from scripts.forecasting.statistical import get_statistical_models
+from scripts.hybrid_models.hybrid import get_hybrid_models
+from scripts.machine_learning.ml_models import get_machine_learning_models
+from scripts.preprocessing.data_loader import DataSchema
+from scripts.probabilistic_models.probabilistic import get_probabilistic_models
+from scripts.synthetic.growth_cycles import SyntheticGrowthCycleGenerator
+from scripts.utils.config import ProjectConfig
+from scripts.utils.dependencies import has_module
+from scripts.utils.paths import safe_name
+
+
+class ForecastRunner:
+    def __init__(
+        self,
+        config: ProjectConfig,
+        schema: DataSchema,
+        output_dirs: dict[str, Path],
+        logger: logging.Logger,
+    ) -> None:
+        self.config = config
+        self.schema = schema
+        self.output_dirs = output_dirs
+        self.logger = logger
+        self.models = self._build_registry()
+        self.synthetic_generator = SyntheticGrowthCycleGenerator(config)
+        self._synthetic_cache: dict[str, pd.DataFrame] = {}
+
+    def run(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+        metric_rows: list[dict[str, Any]] = []
+        forecast_rows: list[dict[str, Any]] = []
+        groups = list(df.groupby(self.schema.group_col, dropna=False))
+        max_bims = self.config.get("execution.max_bims")
+        if max_bims:
+            groups = groups[: int(max_bims)]
+
+        synthetic_mode = self._use_synthetic_training()
+        for group, frame in groups:
+            for target in self.schema.target_columns:
+                if synthetic_mode:
+                    synthetic_cycles = self._synthetic_cycles_for_target(df, target)
+                    metrics, forecasts = self._run_synthetic_group_target(str(group), frame, target, synthetic_cycles)
+                else:
+                    metrics, forecasts = self._run_group_target(str(group), frame, target)
+                metric_rows.extend(metrics)
+                forecast_rows.extend(forecasts)
+
+        metrics_df = pd.DataFrame(metric_rows)
+        forecasts_df = pd.DataFrame(forecast_rows)
+        metrics_path = self.output_dirs["metrics"] / "model_metrics.csv"
+        forecast_path = self.output_dirs["forecasts"] / "all_forecasts.csv"
+        metrics_path.parent.mkdir(parents=True, exist_ok=True)
+        forecast_path.parent.mkdir(parents=True, exist_ok=True)
+        metrics_df.to_csv(metrics_path, index=False, encoding="utf-8-sig")
+        forecasts_df.to_csv(forecast_path, index=False, encoding="utf-8-sig")
+        self.logger.info("Saved metrics=%s forecasts=%s", metrics_path, forecast_path)
+        return metrics_df, forecasts_df
+
+    def _run_synthetic_group_target(
+        self,
+        group: str,
+        frame: pd.DataFrame,
+        target: str,
+        synthetic_cycles: pd.DataFrame,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        metrics: list[dict[str, Any]] = []
+        forecasts: list[dict[str, Any]] = []
+        if target not in frame.columns:
+            return metrics, forecasts
+
+        frame = frame.sort_values(self.schema.date_col).copy()
+        frame[target] = pd.to_numeric(frame[target], errors="coerce")
+        valid = frame.dropna(subset=[target, self.schema.date_col]).copy()
+        if len(valid) <= 1:
+            metrics.append(self._status_row(group, target, "pipeline", "synthetic_full_cycle", "skipped", 0, "too_few_real_points"))
+            return metrics, forecasts
+
+        validation = pd.Series(
+            valid[target].to_numpy(dtype=float),
+            index=pd.to_datetime(valid[self.schema.date_col]),
+            name=target,
+        )
+        self.logger.info(
+            "Synthetic training validation for BIM=%s target=%s real_points=%d synthetic_cycles=%d",
+            group,
+            target,
+            len(validation),
+            int(synthetic_cycles["cycle_id"].nunique()) if "cycle_id" in synthetic_cycles else 0,
+        )
+
+        for model in self.models:
+            started = time.perf_counter()
+            try:
+                synthetic_method = getattr(model, "fit_predict_from_synthetic", None)
+                if not callable(synthetic_method):
+                    raise ModelSkipped("model does not implement synthetic-cycle training")
+                pred, y_true, test_dates = synthetic_method(
+                    synthetic_cycles,
+                    validation,
+                    frame_validation=valid,
+                    target=target,
+                )
+                pred = np.asarray(pred, dtype=float).reshape(-1)
+                y_true = np.asarray(y_true, dtype=float).reshape(-1)
+                if len(pred) != len(y_true):
+                    raise ValueError(f"expected {len(y_true)} predictions, got {len(pred)}")
+                elapsed = time.perf_counter() - started
+                metric = regression_metrics(y_true, pred, n_params=getattr(model, "n_params", 1))
+                row = self._status_row(group, target, model.category, model.name, "ok", elapsed, None)
+                row.update(metric)
+                row["validation_mode"] = "synthetic_full_cycle"
+                row["train_source"] = "synthetic_growth_cycles"
+                row["train_points"] = int(len(synthetic_cycles))
+                row["test_points"] = int(len(y_true))
+                row["metadata"] = json.dumps(_jsonable(model.metadata), ensure_ascii=False)
+                metrics.append(row)
+                forecasts.extend(
+                    self._forecast_rows(
+                        group,
+                        target,
+                        model,
+                        test_dates,
+                        y_true,
+                        pred,
+                        validation_mode="synthetic_full_cycle",
+                        train_source="synthetic_growth_cycles",
+                    )
+                )
+                self._save_model_artifact(model, group, target)
+                self._save_interpretability(model, group, target)
+                self._plot_synthetic_validation(group, target, model.name, valid, test_dates, pred)
+            except ModelSkipped as exc:
+                elapsed = time.perf_counter() - started
+                row = self._status_row(group, target, model.category, model.name, "skipped", elapsed, str(exc))
+                row["validation_mode"] = "synthetic_full_cycle"
+                row["train_source"] = "synthetic_growth_cycles"
+                metrics.append(row)
+            except Exception as exc:
+                elapsed = time.perf_counter() - started
+                self.logger.exception("Synthetic validation failed BIM=%s target=%s model=%s", group, target, model.name)
+                row = self._status_row(group, target, model.category, model.name, "failed", elapsed, str(exc))
+                row["validation_mode"] = "synthetic_full_cycle"
+                row["train_source"] = "synthetic_growth_cycles"
+                metrics.append(row)
+                if not self.config.get("execution.continue_on_error", True):
+                    raise
+        return metrics, forecasts
+
+    def _run_group_target(
+        self,
+        group: str,
+        frame: pd.DataFrame,
+        target: str,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        metrics: list[dict[str, Any]] = []
+        forecasts: list[dict[str, Any]] = []
+        if target not in frame.columns:
+            return metrics, forecasts
+
+        frame = frame.sort_values(self.schema.date_col).copy()
+        frame[target] = pd.to_numeric(frame[target], errors="coerce")
+        valid = frame.dropna(subset=[target, self.schema.date_col]).copy()
+        n = len(valid)
+        min_train = int(self.config.get("execution.min_train_points", 5))
+        if n <= min_train:
+            metrics.append(self._status_row(group, target, "pipeline", "split", "skipped", 0, "too_few_points"))
+            return metrics, forecasts
+
+        configured_horizon = int(self.config.get("execution.forecast_horizon", 5))
+        fraction_horizon = max(1, int(math.ceil(n * float(self.config.get("execution.test_fraction", 0.25)))))
+        test_size = min(configured_horizon, fraction_horizon, n - min_train)
+        train_frame = valid.iloc[:-test_size].copy()
+        test_frame = valid.iloc[-test_size:].copy()
+        train = pd.Series(train_frame[target].to_numpy(dtype=float), index=pd.to_datetime(train_frame[self.schema.date_col]), name=target)
+        y_true = test_frame[target].to_numpy(dtype=float)
+        test_dates = pd.to_datetime(test_frame[self.schema.date_col])
+
+        self.logger.info("Training %d models for BIM=%s target=%s train=%d test=%d", len(self.models), group, target, len(train), len(y_true))
+        for model in self.models:
+            started = time.perf_counter()
+            try:
+                if len(train.dropna()) < model.min_points:
+                    raise ModelSkipped(f"requires at least {model.min_points} training points")
+                pred = model.fit_predict(train, len(y_true), frame_train=train_frame, frame_test=test_frame, target=target)
+                pred = np.asarray(pred, dtype=float).reshape(-1)[: len(y_true)]
+                if len(pred) != len(y_true):
+                    raise ValueError(f"expected {len(y_true)} predictions, got {len(pred)}")
+                elapsed = time.perf_counter() - started
+                metric = regression_metrics(y_true, pred, n_params=getattr(model, "n_params", 1))
+                row = self._status_row(group, target, model.category, model.name, "ok", elapsed, None)
+                row.update(metric)
+                row["validation_mode"] = "temporal_holdout"
+                row["train_source"] = "real_prefix"
+                row["train_points"] = int(len(train))
+                row["test_points"] = int(len(y_true))
+                row["metadata"] = json.dumps(_jsonable(model.metadata), ensure_ascii=False)
+                metrics.append(row)
+                forecasts.extend(self._forecast_rows(group, target, model, test_dates, y_true, pred))
+                self._save_model_artifact(model, group, target)
+                self._save_interpretability(model, group, target)
+                self._plot_forecast(group, target, model.name, train_frame, test_frame, pred)
+            except ModelSkipped as exc:
+                elapsed = time.perf_counter() - started
+                metrics.append(self._status_row(group, target, model.category, model.name, "skipped", elapsed, str(exc)))
+            except Exception as exc:
+                elapsed = time.perf_counter() - started
+                self.logger.exception("Model failed BIM=%s target=%s model=%s", group, target, model.name)
+                metrics.append(self._status_row(group, target, model.category, model.name, "failed", elapsed, str(exc)))
+                if not self.config.get("execution.continue_on_error", True):
+                    raise
+        return metrics, forecasts
+
+    def _use_synthetic_training(self) -> bool:
+        strategy = str(self.config.get("validation.strategy", "") or "").strip().lower()
+        return bool(self.config.get("synthetic_training.enabled", False)) or strategy == "synthetic_full_cycle"
+
+    def _synthetic_cycles_for_target(self, df: pd.DataFrame, target: str) -> pd.DataFrame:
+        if target in self._synthetic_cache:
+            return self._synthetic_cache[target]
+        valid = df.dropna(subset=[target, self.schema.date_col]).copy()
+        group_lengths = valid.groupby(self.schema.group_col, dropna=False)[target].count().tolist()
+        synthetic = self.synthetic_generator.generate(valid[target], group_lengths, target)
+        self._synthetic_cache[target] = synthetic
+        if self.config.get("synthetic_training.save_dataset", True):
+            processed_dir = self.output_dirs["processed"]
+            processed_dir.mkdir(parents=True, exist_ok=True)
+            suffix = safe_name(target)
+            path = processed_dir / f"synthetic_growth_cycles_{suffix}.csv"
+            synthetic.to_csv(path, index=False, encoding="utf-8-sig")
+            self.logger.info("Synthetic growth cycles saved for target=%s path=%s rows=%d", target, path, len(synthetic))
+        return synthetic
+
+    def _build_registry(self) -> list[ForecastModel]:
+        enabled = self.config.get("models.enabled_groups", {})
+        seasonal_periods = int(self.config.get("validation.seasonal_periods", 3))
+        random_state = int(self.config.get("execution.random_state", 42))
+        heavy = bool(self.config.get("execution.heavy_deep_learning", False))
+        registry: list[ForecastModel] = []
+        if enabled.get("classical", True):
+            registry.extend(get_classical_models(seasonal_periods))
+        if enabled.get("statistical", True):
+            registry.extend(get_statistical_models(seasonal_periods))
+        if enabled.get("biological", True):
+            registry.extend(get_biological_models())
+        if enabled.get("differential_equations", True):
+            registry.extend(get_differential_equation_models())
+        if enabled.get("probabilistic", True):
+            registry.extend(get_probabilistic_models())
+        if enabled.get("machine_learning", True):
+            registry.extend(get_machine_learning_models(random_state))
+        if enabled.get("deep_learning", True):
+            registry.extend(get_deep_learning_models(random_state, heavy))
+        if enabled.get("hybrid", True):
+            registry.extend(get_hybrid_models())
+        return registry
+
+    def _status_row(
+        self,
+        group: str,
+        target: str,
+        category: str,
+        model: str,
+        status: str,
+        elapsed: float,
+        error: str | None,
+    ) -> dict[str, Any]:
+        row: dict[str, Any] = {
+            "BIM": group,
+            "target": target,
+            "category": category,
+            "model": model,
+            "status": status,
+            "fit_seconds": elapsed,
+            "error": error,
+        }
+        for metric in ["RMSE", "MAE", "MAPE", "SMAPE", "R2", "Adjusted_R2", "AIC", "BIC", "LogLikelihood"]:
+            row.setdefault(metric, np.nan)
+        return row
+
+    def _forecast_rows(
+        self,
+        group: str,
+        target: str,
+        model: ForecastModel,
+        dates: pd.Series | pd.Index,
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        validation_mode: str = "temporal_holdout",
+        train_source: str = "real_prefix",
+    ) -> list[dict[str, Any]]:
+        rows = []
+        for date, true, pred in zip(dates, y_true, y_pred):
+            rows.append(
+                {
+                    "BIM": group,
+                    "target": target,
+                    "category": model.category,
+                    "model": model.name,
+                    "date": str(pd.to_datetime(date)),
+                    "y_true": float(true),
+                    "y_pred": float(pred),
+                    "residual": float(true - pred),
+                    "validation_mode": validation_mode,
+                    "train_source": train_source,
+                }
+            )
+        model_dir = self.output_dirs["forecasts"] / safe_name(group) / safe_name(target)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(rows).to_csv(model_dir / f"{safe_name(model.name)}.csv", index=False, encoding="utf-8-sig")
+        return rows
+
+    def _save_model_artifact(self, model: ForecastModel, group: str, target: str) -> None:
+        if not self.config.get("execution.save_models", True):
+            return
+        model_dir = self.output_dirs["models"] / safe_name(group) / safe_name(target)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        card = {
+            "BIM": group,
+            "target": target,
+            "category": model.category,
+            "model": model.name,
+            "metadata": _jsonable(model.metadata),
+        }
+        (model_dir / f"{safe_name(model.name)}.json").write_text(json.dumps(card, indent=2, ensure_ascii=False), encoding="utf-8")
+        try:
+            model.save(model_dir / f"{safe_name(model.name)}.pkl")
+        except Exception as exc:
+            self.logger.debug("Could not pickle model %s: %s", model.name, exc)
+
+    def _save_interpretability(self, model: ForecastModel, group: str, target: str) -> None:
+        out_dir = self.output_dirs["shap"] / safe_name(group) / safe_name(target)
+        importance = model.feature_importance()
+        if not importance.empty:
+            save_feature_importance(importance, out_dir / f"{safe_name(model.name)}_feature_importance.csv")
+        if not has_module("shap"):
+            save_shap_status(out_dir / f"{safe_name(model.name)}_shap_status.csv", model.name, "shap package is not installed")
+
+    def _plot_forecast(
+        self,
+        group: str,
+        target: str,
+        model_name: str,
+        train_frame: pd.DataFrame,
+        test_frame: pd.DataFrame,
+        pred: np.ndarray,
+    ) -> None:
+        try:
+            import matplotlib.pyplot as plt  # type: ignore
+        except Exception:
+            return
+        make_png = bool(self.config.get("execution.make_png", True))
+        make_svg = bool(self.config.get("execution.make_svg", True))
+        out_dir = self.output_dirs["figures"] / safe_name(group) / "forecasts" / safe_name(target)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        fig, ax = plt.subplots(figsize=(11, 5))
+        ax.plot(train_frame[self.schema.date_col], train_frame[target], label="train", marker="o")
+        ax.plot(test_frame[self.schema.date_col], test_frame[target], label="test", marker="o")
+        ax.plot(test_frame[self.schema.date_col], pred, label=f"forecast {model_name}", marker="x")
+        ax.set_title(f"{group} - {target} - {model_name}")
+        ax.set_xlabel("Fecha")
+        ax.set_ylabel(target)
+        ax.legend()
+        fig.autofmt_xdate()
+        if make_png:
+            fig.savefig(out_dir / f"{safe_name(model_name)}.png", dpi=160, bbox_inches="tight")
+        if make_svg:
+            fig.savefig(out_dir / f"{safe_name(model_name)}.svg", bbox_inches="tight")
+        plt.close(fig)
+
+    def _plot_synthetic_validation(
+        self,
+        group: str,
+        target: str,
+        model_name: str,
+        real_frame: pd.DataFrame,
+        pred_dates: pd.Series | pd.Index,
+        pred: np.ndarray,
+    ) -> None:
+        try:
+            import matplotlib.pyplot as plt  # type: ignore
+        except Exception:
+            return
+        make_png = bool(self.config.get("execution.make_png", True))
+        make_svg = bool(self.config.get("execution.make_svg", True))
+        out_dir = self.output_dirs["figures"] / safe_name(group) / "forecasts" / safe_name(target)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        fig, ax = plt.subplots(figsize=(11, 5))
+        real_dates = pd.to_datetime(real_frame[self.schema.date_col])
+        ax.plot(real_dates, real_frame[target], label="real cycle", marker="o")
+        ax.plot(pd.to_datetime(pred_dates), pred, label=f"synthetic-trained {model_name}", marker="x")
+        ax.set_title(f"{group} - {target} - {model_name} synthetic full-cycle validation")
+        ax.set_xlabel("Fecha")
+        ax.set_ylabel(target)
+        ax.legend()
+        fig.autofmt_xdate()
+        if make_png:
+            fig.savefig(out_dir / f"{safe_name(model_name)}.png", dpi=160, bbox_inches="tight")
+        if make_svg:
+            fig.savefig(out_dir / f"{safe_name(model_name)}.svg", bbox_inches="tight")
+        plt.close(fig)
+
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, (np.integer, np.floating)):
+        return value.item()
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return str(value)

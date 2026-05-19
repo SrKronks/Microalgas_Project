@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,SVR,2026-03-24 13:01:56,0.669,0.7834560304462799,-0.11445603044627983,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-03-25 12:01:45,0.765,0.6769984453305948,0.08800155466940518,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-03-26 12:09:38,0.456,0.8168287428691199,-0.36082874286911987,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-03-27 12:51:34,0.469,0.8102428306584851,-0.34124283065848515,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-03-30 12:39:11,0.694,0.7088409873066949,-0.01484098730669492,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-03-31 14:37:02,0.677,0.897696402465665,-0.2206964024656649,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-01 14:27:25,0.85,0.75899248860485,0.09100751139514995,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-02 13:44:19,0.814,0.9340321821286734,-0.1200321821286735,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-06 14:57:18,0.68,0.8519762360840719,-0.17197623608407187,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-07 14:58:47,0.739,0.601432745942668,0.13756725405733194,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-08 14:28:43,0.665,0.766422367787785,-0.10142236778778502,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-09 16:17:04,0.637,0.6738365666905466,-0.03683656669054658,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-10 15:05:25,0.657,0.6163875634396878,0.040612436560312215,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,SVR,2026-04-13 15:24:05,0.558,0.6734172026515153,-0.11541720265151523,synthetic_full_cycle,synthetic_growth_cycles

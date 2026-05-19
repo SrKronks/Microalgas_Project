@@ -1,0 +1,2 @@
+"""Statistical and temporal analysis."""
+

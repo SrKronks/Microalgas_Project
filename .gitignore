@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+logs/*.log
+outputs/models/**/*.pkl
+outputs/models/**/*.joblib
+data/processed/*.parquet
+*.tmp

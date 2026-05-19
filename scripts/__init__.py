@@ -1,0 +1,2 @@
+"""Microalgae analytics project package."""
+

@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,Lasso,2026-03-24 13:01:56,0.669,0.7707038247396867,-0.10170382473968664,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-03-25 12:01:45,0.765,0.6975349310917573,0.06746506890824266,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-03-26 12:09:38,0.456,0.7906364017272348,-0.3346364017272348,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-03-27 12:51:34,0.469,0.47764034978970205,-0.008640349789702073,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-03-30 12:39:11,0.694,0.4796412703611621,0.21435872963883784,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-03-31 14:37:02,0.677,0.7495795942291783,-0.07257959422917826,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-01 14:27:25,0.85,0.7304197759687787,0.11958022403122126,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-02 13:44:19,0.814,0.8827337042353507,-0.06873370423535075,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-06 14:57:18,0.68,0.8474773416895494,-0.1674773416895493,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-07 14:58:47,0.739,0.6880307955461634,0.05096920445383657,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-08 14:28:43,0.665,0.7534378739811143,-0.08843787398111425,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-09 16:17:04,0.637,0.6927949377435834,-0.05579493774358335,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-10 15:05:25,0.657,0.6567490833046508,0.0002509166953492681,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Lasso,2026-04-13 15:24:05,0.558,0.6863002645906888,-0.12830026459068877,synthetic_full_cycle,synthetic_growth_cycles

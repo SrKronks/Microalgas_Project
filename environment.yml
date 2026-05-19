@@ -1,0 +1,38 @@
+name: microalgas-project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - openpyxl
+  - pyyaml
+  - scipy
+  - statsmodels
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - plotly
+  - jinja2
+  - reportlab
+  - joblib
+  - networkx
+  - sympy
+  - optuna
+  - shap
+  - xgboost
+  - lightgbm
+  - catboost
+  - prophet
+  - hmmlearn
+  - filterpy
+  - arch
+  - pymc
+  - pytorch
+  - tensorflow
+  - umap-learn
+  - pytest
+  - pip
+  - pip:
+      - darts

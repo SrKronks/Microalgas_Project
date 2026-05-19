@@ -1,0 +1,80 @@
+project:
+  name: Microalgas_Project
+  description: Advanced time-series analytics and forecasting for microalgae cultures.
+
+data:
+  raw_file: data/raw/historial-monitoreos-2026-05-14.xlsx
+  sheet_name:
+  date_column:
+  group_column:
+  target_columns:
+    - OD
+  preferred_analysis_columns:
+    - OD
+    - pH
+    - EC
+    - Temperatura
+    - Temp
+    - mu
+    - growth
+  drop_normalized_duplicates: false
+
+execution:
+  random_state: 42
+  n_jobs: -1
+  forecast_horizon: 5
+  test_fraction: 0.25
+  min_train_points: 5
+  max_bims:
+  continue_on_error: true
+  save_models: true
+  make_png: true
+  make_svg: true
+  make_pdf: true
+  heavy_deep_learning: false
+
+validation:
+  strategy: synthetic_full_cycle
+  imputation_strategy: time_interpolate
+  outlier_method: iqr
+  outlier_iqr_multiplier: 1.5
+  rolling_windows:
+    - 3
+    - 5
+  seasonal_periods: 3
+
+synthetic_training:
+  enabled: true
+  n_cycles: 2000
+  min_cycle_points: 8
+  max_cycle_points: 32
+  noise_fraction: 0.035
+  decline_probability: 0.70
+  seasonality_probability: 0.45
+  save_dataset: true
+
+models:
+  enabled_groups:
+    classical: true
+    statistical: true
+    biological: true
+    differential_equations: true
+    probabilistic: true
+    machine_learning: true
+    deep_learning: true
+    hybrid: true
+  optional_models:
+    xgboost: true
+    lightgbm: true
+    catboost: true
+    prophet: true
+    darts: false
+    pymc: false
+
+reporting:
+  language: es
+  title: Plataforma de analisis y pronostico de microalgas
+  author: Codex
+  export_excel: true
+  export_html: true
+  export_pdf: true

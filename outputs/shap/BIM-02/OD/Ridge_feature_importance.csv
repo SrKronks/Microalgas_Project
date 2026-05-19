@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,1.4640924360635994,Ridge
+lag_2,-0.4405699684061857,Ridge
+lag_3,-0.09310448694638301,Ridge
