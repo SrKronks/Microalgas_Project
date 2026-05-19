@@ -27,7 +27,6 @@ dependencies:
   - prophet
   - hmmlearn
   - filterpy
-  - arch
   - pymc
   - pytorch
   - tensorflow
@@ -36,3 +35,4 @@ dependencies:
   - pip
   - pip:
       - darts
+      - arch

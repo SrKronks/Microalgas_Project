@@ -36,6 +36,12 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+Para una instalacion ligera de desarrollo/EDA:
+
+```bash
+pip install -r requirements-minimal.txt
+```
+
 En Linux/macOS:
 
 ```bash
@@ -68,6 +74,10 @@ Tambien puedes usar otro Excel:
 ```bash
 python main.py --input ruta/al/archivo.xlsx
 ```
+
+Si el archivo no esta en la ruta configurada, el pipeline se detiene con un
+mensaje explicito. Esto evita depender de rutas locales de un computador
+especifico y facilita ejecutar el proyecto en Linux, servidor o CI.
 
 O cambiar objetivos de pronostico:
 
@@ -130,6 +140,28 @@ python -m scripts.sensitivity.decline_sensitivity --probabilities 0.4,0.7 --n-cy
 Esto permite correr una version minima con `pandas/numpy/openpyxl`, y una
 version completa al instalar `requirements.txt`.
 
+## Graficos de ciclos sinteticos
+
+Despues de ejecutar el pipeline con `synthetic_training.save_dataset: true`,
+puedes graficar ejemplos de los ciclos simulados usados para entrenar:
+
+```bash
+python -m scripts.synthetic.plot_examples
+```
+
+Salidas por defecto:
+
+- `outputs/figures/synthetic_examples/OD_synthetic_cycle_overlay.png`
+- `outputs/figures/synthetic_examples/OD_SYN-00001_phases.png`
+
+Opciones utiles:
+
+```bash
+python -m scripts.synthetic.plot_examples --n-cycles 20
+python -m scripts.synthetic.plot_examples --cycle-id SYN-00025
+python -m scripts.synthetic.plot_examples --input data/processed/synthetic_growth_cycles_OD.csv
+```
+
 ## Salidas principales
 
 - `outputs/reports/microalgas_report.html`
@@ -158,3 +190,7 @@ Edita `configs/config.yaml` para:
 El pipeline usa rutas relativas, logging, configuracion central, manejo robusto
 de errores y deteccion automatica de GPU/CUDA cuando `torch` o `tensorflow`
 estan disponibles.
+
+Los datos crudos y salidas generadas (`data/raw`, `data/processed`, `outputs`,
+`logs`, `catboost_info`) estan pensados como artefactos locales y quedan
+ignorados por Git para evitar subir archivos pesados o sensibles por accidente.

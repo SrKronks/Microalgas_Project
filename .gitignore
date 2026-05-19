@@ -5,8 +5,12 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
-logs/*.log
+logs/
+catboost_info/
+outputs/
+data/raw/
+data/processed/
 outputs/models/**/*.pkl
 outputs/models/**/*.joblib
-data/processed/*.parquet
 *.tmp
+*.zip

@@ -75,7 +75,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "reporting": {
         "language": "es",
         "title": "Plataforma de analisis y pronostico de microalgas",
-        "author": "Codex",
+        "author": "Sebastian Pizarro",
         "export_excel": True,
         "export_html": True,
         "export_pdf": True,

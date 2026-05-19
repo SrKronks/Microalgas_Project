@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -140,13 +139,10 @@ def _resolve_raw_file(config: ProjectConfig, logger: logging.Logger) -> Path:
     raw_path = config.path("data.raw_file")
     if raw_path.exists():
         return raw_path
-    candidate = Path("C:/Users/Asus/Downloads/historial-monitoreos-2026-05-14.xlsx")
-    if candidate.exists():
-        raw_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(candidate, raw_path)
-        logger.info("Copied raw Excel from %s to %s", candidate, raw_path)
-        return raw_path
-    raise FileNotFoundError(f"Raw Excel not found: {raw_path}")
+    raise FileNotFoundError(
+        f"Raw Excel not found: {raw_path}. "
+        "Place the file at the configured data.raw_file path or run with --input /path/to/file.xlsx."
+    )
 
 
 def _save_quality_outputs(quality_result: Any, diagnostics_dir: Path) -> None:
