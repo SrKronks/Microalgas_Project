@@ -10,3 +10,4 @@ outputs/models/**/*.pkl
 outputs/models/**/*.joblib
 data/processed/*.parquet
 *.tmp
+outputs/
