@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-14,OD,deep_learning,MLP,2026-03-30 13:03:49,0.594,0.7325988030010928,-0.13859880300109284,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-03-31 14:52:45,0.702,0.6064484605460134,0.09555153945398653,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-01 14:54:33,0.689,0.7589790689277489,-0.06997906892774897,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-02 14:14:59,0.719,0.7330664037907664,-0.014066403790766402,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-06 15:27:44,0.589,0.7438484005027055,-0.15484840050270554,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-07 15:22:31,0.608,0.5879350787124533,0.020064921287546666,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-08 14:43:44,0.631,0.6205399807512004,0.010460019248799579,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-09 16:42:01,0.622,0.696920840209462,-0.07492084020946199,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-10 15:33:07,0.648,0.6625905303513515,-0.014590530351351494,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-13 15:49:57,0.674,0.698606330583756,-0.024606330583755942,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-14 15:22:24,0.674,0.7471647271765236,-0.07316472717652356,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-15 15:16:49,0.581,0.7293255952251794,-0.1483255952251794,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-16 15:06:32,0.527,0.5846327281943531,-0.057632728194353056,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,deep_learning,MLP,2026-04-20 21:20:18,0.437,0.5974952973894438,-0.16049529738944385,synthetic_full_cycle,synthetic_growth_cycles

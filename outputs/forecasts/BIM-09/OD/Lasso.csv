@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-09,OD,machine_learning,Lasso,2026-03-31 14:47:22,0.791,0.8521561077721619,-0.06115610777216185,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Lasso,2026-04-01 14:42:36,0.868,0.8373879328124059,0.030612067187594127,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Lasso,2026-04-02 14:02:36,0.846,0.8896744630226886,-0.043674463022688625,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,5 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T2,OD,machine_learning,Polynomial_Regression,2026-05-08 00:00:00,0.451,0.3815331162644313,0.0694668837355687,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Polynomial_Regression,2026-05-11 00:00:00,0.624,0.405162532043651,0.218837467956349,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Polynomial_Regression,2026-05-12 00:00:00,0.608,0.7655781985085076,-0.15757819850850763,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Polynomial_Regression,2026-05-13 00:00:00,0.553,0.6600414261177746,-0.10704142611777456,synthetic_full_cycle,synthetic_growth_cycles

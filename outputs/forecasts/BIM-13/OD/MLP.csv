@@ -1,0 +1,20 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-13,OD,deep_learning,MLP,2026-03-27 13:20:00,0.544,0.5071001228279293,0.03689987717207077,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-03-30 13:02:00,0.446,0.5974885412344022,-0.1514885412344022,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-03-31 14:51:00,0.539,0.4190599231199833,0.11994007688001673,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-01 14:51:00,0.597,0.6147426302098571,-0.017742630209857113,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-02 14:12:00,0.621,0.6746438684961549,-0.05364386849615488,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-06 15:24:00,0.739,0.6713429880623936,0.06765701193760643,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-07 15:20:00,0.734,0.8117065098795635,-0.07770650987956351,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-08 14:42:00,0.845,0.7821367945724156,0.06286320542758439,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-09 16:39:00,0.5,0.8744876710692033,-0.37448767106920333,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-10 15:30:00,0.534,0.5292383376799031,0.004761662320096893,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-13 15:47:00,0.651,0.5900283683923822,0.06097163160761787,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-14 15:19:00,0.651,0.777290929782823,-0.12629092978282297,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-15 15:14:00,0.73,0.6898407575041674,0.04015924249583258,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-16 15:04:50,0.676,0.7730975331690386,-0.09709753316903857,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-20 21:20:08,0.674,0.692248491599923,-0.018248491599922922,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-27 16:30:31,0.577,0.6781112499402495,-0.10111124994024956,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-28 15:27:06,0.607,0.5911806702300267,0.015819329769973245,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-04-29 15:33:16,0.605,0.6845754794816379,-0.0795754794816379,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,deep_learning,MLP,2026-05-13 15:21:00,0.414,0.6591881232645342,-0.24518812326453426,synthetic_full_cycle,synthetic_growth_cycles

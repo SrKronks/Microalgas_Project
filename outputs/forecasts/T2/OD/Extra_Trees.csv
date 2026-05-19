@@ -1,0 +1,5 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T2,OD,machine_learning,Extra_Trees,2026-05-08 00:00:00,0.451,0.5535017342723786,-0.10250173427237858,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Extra_Trees,2026-05-11 00:00:00,0.624,0.49460816991158096,0.12939183008841904,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Extra_Trees,2026-05-12 00:00:00,0.608,0.8468528270988384,-0.23885282709883837,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Extra_Trees,2026-05-13 00:00:00,0.553,0.6649874298476545,-0.11198742984765442,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,87.92075654001009,CatBoost
+lag_2,2.997757352600902,CatBoost
+lag_3,9.081486107389008,CatBoost

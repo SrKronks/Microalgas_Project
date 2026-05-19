@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,CatBoost,2026-03-24 13:01:56,0.669,0.7865155054493012,-0.11751550544930112,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-03-25 12:01:45,0.765,0.6880636674453049,0.07693633255469512,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-03-26 12:09:38,0.456,0.8046971304924294,-0.3486971304924294,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-03-27 12:51:34,0.469,0.4987948714462232,-0.029794871446223226,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-03-30 12:39:11,0.694,0.5577100292604054,0.1362899707395946,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-03-31 14:37:02,0.677,0.8976448336646459,-0.22064483366464582,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-01 14:27:25,0.85,0.7708554951405814,0.0791445048594186,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-02 13:44:19,0.814,0.9141143930384923,-0.10011439303849234,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-06 14:57:18,0.68,0.836656492058833,-0.15665649205883292,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-07 14:58:47,0.739,0.5955959726909769,0.14340402730902313,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-08 14:28:43,0.665,0.7277212539967929,-0.06272125399679285,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-09 16:17:04,0.637,0.6924657502143571,-0.05546575021435707,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-10 15:05:25,0.657,0.6293234802653791,0.02767651973462093,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,CatBoost,2026-04-13 15:24:05,0.558,0.7193704817731351,-0.16137048177313507,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,13 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-01 14:49:40,0.674,0.6223495492765141,0.05165045072348595,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-02 14:09:21,0.657,0.703580424877204,-0.04658042487720393,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-06 15:22:03,0.667,0.6968359770901453,-0.029835977090145294,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-07 15:18:02,0.637,0.6930296985611288,-0.05602969856112883,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-08 14:40:56,0.669,0.6635407826449738,0.005459217355026191,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-09 16:39:17,0.652,0.6962952996439221,-0.04429529964392209,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-10 15:28:16,0.647,0.682839423875869,-0.035839423875869025,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-13 15:44:57,0.66,0.6723583805563994,-0.012358380556399373,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-14 15:16:37,0.66,0.6890306043217387,-0.02903060432173865,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-15 15:12:47,0.685,0.6898295838432857,-0.00482958384328569,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-16 15:02:28,0.579,0.714590108995109,-0.13559010899510904,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Elastic_Net,2026-04-20 21:19:58,0.62,0.6007975321058444,0.019202467894155584,synthetic_full_cycle,synthetic_growth_cycles

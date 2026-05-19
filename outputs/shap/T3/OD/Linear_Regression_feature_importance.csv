@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,1.4935212300860012,Linear_Regression
+lag_2,-0.4888330221182524,Linear_Regression
+lag_3,-0.07278536343103842,Linear_Regression

@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,1.0357326598708172,Lasso
+lag_2,-0.0,Lasso
+lag_3,-0.11941254173813101,Lasso

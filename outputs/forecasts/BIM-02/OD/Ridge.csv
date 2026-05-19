@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,Ridge,2026-03-24 13:01:56,0.669,0.7773293376422852,-0.10832933764228514,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-03-25 12:01:45,0.765,0.6581941224074688,0.10680587759253124,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-03-26 12:09:38,0.456,0.81980608659725,-0.36380608659724994,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-03-27 12:51:34,0.469,0.33059997161673504,0.13840002838326493,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-03-30 12:39:11,0.694,0.47683126277589194,0.217168737224108,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-03-31 14:37:02,0.677,0.8292939377673413,-0.15229393776734124,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-01 14:27:25,0.85,0.7040657651327796,0.14593423486722035,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-02 13:44:19,0.814,0.9438949364715522,-0.12989493647155226,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-06 14:57:18,0.68,0.8165517805172688,-0.1365517805172688,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-07 14:58:47,0.739,0.6201168367056303,0.11888316329436965,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-08 14:28:43,0.665,0.7688864277297346,-0.10388642772973455,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-09 16:17:04,0.637,0.6470259605760251,-0.010025960576025117,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-10 15:05:25,0.657,0.6331403852983927,0.023859614701607357,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,Ridge,2026-04-13 15:24:05,0.558,0.6816479251690586,-0.12364792516905854,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-09,OD,machine_learning,Elastic_Net,2026-03-31 14:47:22,0.791,0.8634927283785878,-0.07249272837858778,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Elastic_Net,2026-04-01 14:42:36,0.868,0.8440426845066938,0.023957315493306153,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Elastic_Net,2026-04-02 14:02:36,0.846,0.8899502719916973,-0.04395027199169732,synthetic_full_cycle,synthetic_growth_cycles

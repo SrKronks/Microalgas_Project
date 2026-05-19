@@ -1,0 +1,16 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-14,OD,machine_learning,XGBoost,2026-03-27 13:21:46,0.642,0.6298108696937561,0.012189130306243912,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-03-30 13:03:49,0.594,0.7523632049560547,-0.15836320495605472,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-03-31 14:52:45,0.702,0.6111612319946289,0.09083876800537105,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-01 14:54:33,0.689,0.8293957114219666,-0.1403957114219666,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-02 14:14:59,0.719,0.7549189329147339,-0.035918932914733914,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-06 15:27:44,0.589,0.7505072951316833,-0.16150729513168338,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-07 15:22:31,0.608,0.5916544198989868,0.01634558010101317,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-08 14:43:44,0.631,0.6068078279495239,0.02419217205047608,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-09 16:42:01,0.622,0.677099347114563,-0.05509934711456299,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-10 15:33:07,0.648,0.65093994140625,-0.0029399414062499796,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-13 15:49:57,0.674,0.6975919604301453,-0.02359196043014522,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-14 15:22:24,0.674,0.7160491943359375,-0.042049194335937456,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-15 15:16:49,0.581,0.7062625288963318,-0.12526252889633183,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-16 15:06:32,0.527,0.5992093682289124,-0.07220936822891233,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,XGBoost,2026-04-20 21:20:18,0.437,0.565731406211853,-0.12873140621185303,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,14 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-17,OD,machine_learning,SVR,2026-03-30 13:17:54,0.814,1.0014622229173744,-0.18746222291737447,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-03-31 14:56:23,0.86,0.8606718586963764,-0.0006718586963764261,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-01 14:59:45,0.888,0.8652717553407612,0.02272824465923884,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-02 14:23:34,0.862,0.9069716690009402,-0.044971669000940184,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-06 15:35:46,0.859,0.8571746123403485,0.0018253876596514562,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-07 15:28:50,0.826,0.8473344946727035,-0.02133449467270354,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-08 14:48:55,0.849,0.8088329983869265,0.040167001613073516,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-09 16:48:00,0.86,0.8454823335819499,0.01451766641805008,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-10 15:39:48,0.898,0.8673249365877662,0.030675063412233805,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-13 15:57:32,0.863,0.9090314957127725,-0.04603149571277254,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-20 21:20:45,0.302,0.8577544398983334,-0.5557544398983334,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-27 16:20:17,0.249,1.0286694110971946,-0.7796694110971946,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,SVR,2026-04-28 15:35:12,0.261,1.825195453897154,-1.5641954538971539,synthetic_full_cycle,synthetic_growth_cycles

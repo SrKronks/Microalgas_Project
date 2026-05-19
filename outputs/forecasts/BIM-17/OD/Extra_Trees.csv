@@ -1,0 +1,14 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-17,OD,machine_learning,Extra_Trees,2026-03-30 13:17:54,0.814,0.9807297135040512,-0.1667297135040513,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-03-31 14:56:23,0.86,0.8525171727228491,0.007482827277150883,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-01 14:59:45,0.888,0.8524209580095237,0.035579041990476346,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-02 14:23:34,0.862,0.916760586469876,-0.05476058646987603,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-06 15:35:46,0.859,0.8637852136341696,-0.004785213634169616,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-07 15:28:50,0.826,0.8378608570881818,-0.011860857088181853,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-08 14:48:55,0.849,0.8123274309571085,0.03667256904289151,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-09 16:48:00,0.86,0.8376302995605319,0.022369700439468065,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-10 15:39:48,0.898,0.8473852347748192,0.050614765225180824,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-13 15:57:32,0.863,0.8820392246373018,-0.019039224637301788,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-20 21:20:45,0.302,0.8586459092510925,-0.5566459092510925,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-27 16:20:17,0.249,0.5243381810233534,-0.2753381810233534,synthetic_full_cycle,synthetic_growth_cycles
+BIM-17,OD,machine_learning,Extra_Trees,2026-04-28 15:35:12,0.261,0.3641308915214971,-0.10313089152149707,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,LightGBM,2026-03-24 13:01:56,0.669,0.7890474894613232,-0.12004748946132315,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-03-25 12:01:45,0.765,0.7048812980542201,0.06011870194577995,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-03-26 12:09:38,0.456,0.7931511541986886,-0.33715115419868863,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-03-27 12:51:34,0.469,0.5184290413477494,-0.04942904134774939,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-03-30 12:39:11,0.694,0.49236075541296687,0.20163924458703308,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-03-31 14:37:02,0.677,0.8907549152239942,-0.21375491522399415,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-01 14:27:25,0.85,0.7452903117534643,0.1047096882465357,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-02 13:44:19,0.814,0.9286060309540772,-0.11460603095407729,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-06 14:57:18,0.68,0.8240268881437371,-0.1440268881437371,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-07 14:58:47,0.739,0.6493238987767469,0.08967610122325309,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-08 14:28:43,0.665,0.7228613674147931,-0.057861367414793086,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-09 16:17:04,0.637,0.7014128775189229,-0.06441287751892288,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-10 15:05:25,0.657,0.6492885323474277,0.007711467652572357,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,LightGBM,2026-04-13 15:24:05,0.558,0.7013859133126383,-0.14338591331263828,synthetic_full_cycle,synthetic_growth_cycles

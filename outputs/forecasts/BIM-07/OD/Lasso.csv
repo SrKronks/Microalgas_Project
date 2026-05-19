@@ -1,0 +1,12 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-07,OD,machine_learning,Lasso,2026-03-26 12:31:08,0.582,0.559409418337198,0.022590581662801923,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-03-27 13:08:16,0.538,0.6274874966950023,-0.08948749669500222,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-03-30 12:48:26,0.63,0.580601721701567,0.04939827829843302,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-03-31 14:44:13,0.637,0.6682467237384417,-0.03124672373844173,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-01 14:38:14,0.662,0.6807510041940151,-0.018751004194015097,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-02 13:58:29,0.701,0.6956583668508777,0.005341633149122282,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-06 15:07:39,0.685,0.7352160527936725,-0.05021605279367247,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-07 15:07:19,0.644,0.7156590166922863,-0.07165901669228625,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-08 14:35:16,0.704,0.6685368885097956,0.03546311149020431,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-04-09 16:22:55,0.724,0.7325914487698546,-0.008591448769854626,synthetic_full_cycle,synthetic_growth_cycles
+BIM-07,OD,machine_learning,Lasso,2026-05-13 15:18:00,0.622,0.7582020161785344,-0.13620201617853445,synthetic_full_cycle,synthetic_growth_cycles

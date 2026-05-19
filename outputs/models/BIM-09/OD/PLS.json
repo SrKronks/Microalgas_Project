@@ -1,0 +1,16 @@
+{
+  "BIM": "BIM-09",
+  "target": "OD",
+  "category": "machine_learning",
+  "model": "PLS",
+  "metadata": {
+    "lags": 3,
+    "train_source": "synthetic_growth_cycles",
+    "synthetic_cycles": 2000,
+    "synthetic_samples": 34316,
+    "prediction_protocol": "one_step_ahead_with_observed_real_lags",
+    "validation_mode": "full_real_cycle_walk_forward",
+    "validation_points": 3,
+    "warmup_points": 3
+  }
+}

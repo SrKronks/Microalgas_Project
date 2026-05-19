@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T2,OD,deep_learning,MLP,2026-05-11 00:00:00,0.624,0.5491179373931165,0.07488206260688346,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,deep_learning,MLP,2026-05-12 00:00:00,0.608,0.7669410688598692,-0.15894106885986925,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,deep_learning,MLP,2026-05-13 00:00:00,0.553,0.6480637759806622,-0.09506377598066218,synthetic_full_cycle,synthetic_growth_cycles

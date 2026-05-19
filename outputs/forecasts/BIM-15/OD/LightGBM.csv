@@ -1,0 +1,12 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-15,OD,machine_learning,LightGBM,2026-03-26 12:54:27,0.565,0.6487089961700852,-0.0837089961700852,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-03-27 13:23:13,0.61,0.5723285131027319,0.03767148689726807,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-03-30 13:14:36,0.788,0.6517274323510154,0.13627256764898465,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-03-31 14:54:02,0.826,0.9026259585725198,-0.07662595857251986,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-01 14:56:32,0.806,0.8755044962941733,-0.06950449629417321,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-02 14:19:04,0.856,0.8029168877068604,0.053083112293139556,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-06 15:30:24,0.706,0.8652917898416708,-0.1592917898416708,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-07 15:24:25,0.677,0.6454241662837282,0.03157583371627182,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-08 14:44:57,0.633,0.6657901337144103,-0.03279013371441031,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-09 16:42:52,0.566,0.6597235945664047,-0.09372359456640478,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,LightGBM,2026-04-10 15:35:36,0.612,0.5753495136791917,0.03665048632080825,synthetic_full_cycle,synthetic_growth_cycles

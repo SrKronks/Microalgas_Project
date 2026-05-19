@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,0.9735044836997986,XGBoost
+lag_2,0.009372846223413944,XGBoost
+lag_3,0.017122609540820122,XGBoost

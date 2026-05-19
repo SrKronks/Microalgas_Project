@@ -1,0 +1,5 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T2,OD,machine_learning,Gaussian_Process_Regression,2026-05-08 00:00:00,0.451,0.6012683613167189,-0.1502683613167189,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Gaussian_Process_Regression,2026-05-11 00:00:00,0.624,0.6036822397685857,0.020317760231414295,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Gaussian_Process_Regression,2026-05-12 00:00:00,0.608,0.8170599859383262,-0.2090599859383262,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Gaussian_Process_Regression,2026-05-13 00:00:00,0.553,0.7217801044042607,-0.1687801044042606,synthetic_full_cycle,synthetic_growth_cycles

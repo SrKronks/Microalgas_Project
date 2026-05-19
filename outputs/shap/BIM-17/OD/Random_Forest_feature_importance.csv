@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,0.9643491479292099,Random_Forest
+lag_2,0.014688883656533092,Random_Forest
+lag_3,0.02096196841425703,Random_Forest

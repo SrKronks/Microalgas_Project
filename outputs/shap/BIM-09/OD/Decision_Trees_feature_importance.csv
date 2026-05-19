@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,0.9964733359753085,Decision_Trees
+lag_2,0.0,Decision_Trees
+lag_3,0.0035266640246915865,Decision_Trees

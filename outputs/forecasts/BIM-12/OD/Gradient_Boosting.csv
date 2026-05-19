@@ -1,0 +1,13 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-01 14:49:40,0.674,0.6102349620825563,0.0637650379174437,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-02 14:09:21,0.657,0.7330016837491817,-0.0760016837491817,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-06 15:22:03,0.667,0.7238246832493515,-0.056824683249351415,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-07 15:18:02,0.637,0.7265601195411971,-0.08956011954119714,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-08 14:40:56,0.669,0.6859246201161524,-0.016924620116152367,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-09 16:39:17,0.652,0.7298866345827336,-0.0778866345827336,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-10 15:28:16,0.647,0.709197349248947,-0.06219734924894693,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-13 15:44:57,0.66,0.6999354266218509,-0.0399354266218509,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-14 15:16:37,0.66,0.7238246832493515,-0.06382468324935142,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-15 15:12:47,0.685,0.7238246832493515,-0.0388246832493514,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-16 15:02:28,0.579,0.7429425867531174,-0.16394258675311746,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gradient_Boosting,2026-04-20 21:19:58,0.62,0.6013172709867584,0.01868272901324164,synthetic_full_cycle,synthetic_growth_cycles

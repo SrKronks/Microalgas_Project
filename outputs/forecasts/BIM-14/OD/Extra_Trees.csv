@@ -1,0 +1,16 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-14,OD,machine_learning,Extra_Trees,2026-03-27 13:21:46,0.642,0.6286997958865846,0.01330020411341537,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-03-30 13:03:49,0.594,0.7394288366034122,-0.14542883660341221,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-03-31 14:52:45,0.702,0.6207831520441122,0.0812168479558878,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-01 14:54:33,0.689,0.7781514264129755,-0.08915142641297558,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-02 14:14:59,0.719,0.7584502478928126,-0.039450247892812595,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-06 15:27:44,0.589,0.7481999894576934,-0.15919998945769342,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-07 15:22:31,0.608,0.6571676098100909,-0.04916760981009094,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-08 14:43:44,0.631,0.6271277245393022,0.003872275460697794,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-09 16:42:01,0.622,0.6914418302412183,-0.0694418302412183,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-10 15:33:07,0.648,0.6368164189829311,0.011183581017068955,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-13 15:49:57,0.674,0.7015907193218287,-0.02759071932182866,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-14 15:22:24,0.674,0.7040595562499928,-0.03005955624999279,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-15 15:16:49,0.581,0.6925804569502921,-0.11158045695029217,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-16 15:06:32,0.527,0.6443196813970543,-0.11731968139705429,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Extra_Trees,2026-04-20 21:20:18,0.437,0.5662972494967881,-0.12929724949678806,synthetic_full_cycle,synthetic_growth_cycles

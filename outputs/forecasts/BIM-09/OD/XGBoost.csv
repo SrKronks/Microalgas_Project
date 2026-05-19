@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-09,OD,machine_learning,XGBoost,2026-03-31 14:47:22,0.791,0.9297783970832825,-0.13877839708328243,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,XGBoost,2026-04-01 14:42:36,0.868,0.835265040397644,0.03273495960235595,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,XGBoost,2026-04-02 14:02:36,0.846,0.8862689137458801,-0.04026891374588015,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-09,OD,machine_learning,Decision_Trees,2026-03-31 14:47:22,0.791,0.840027132436049,-0.04902713243604895,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Decision_Trees,2026-04-01 14:42:36,0.868,0.840027132436049,0.02797286756395101,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Decision_Trees,2026-04-02 14:02:36,0.846,0.8975511641109808,-0.05155116411098082,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,12 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-03-26 12:54:27,0.565,0.7476875482917499,-0.18268754829174993,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-03-27 13:23:13,0.61,0.668879730407216,-0.05887973040721606,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-03-30 13:14:36,0.788,0.6552845847867961,0.13271541521320396,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-03-31 14:54:02,0.826,0.9172207600653175,-0.09122076006531754,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-01 14:56:32,0.806,0.8765947302716337,-0.07059473027163365,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-02 14:19:04,0.856,0.8063341675342762,0.04966583246572376,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-06 15:30:24,0.706,0.8649807867768026,-0.1589807867768026,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-07 15:24:25,0.677,0.624716381875891,0.05228361812410909,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-08 14:44:57,0.633,0.7153658676375074,-0.08236586763750742,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-09 16:42:52,0.566,0.6222114136711234,-0.05621141367112348,synthetic_full_cycle,synthetic_growth_cycles
+BIM-15,OD,machine_learning,Gaussian_Process_Regression,2026-04-10 15:35:36,0.612,0.5730912644194553,0.03890873558054464,synthetic_full_cycle,synthetic_growth_cycles

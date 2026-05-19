@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,0.5588233315929735,Extra_Trees
+lag_2,0.31847429972648783,Extra_Trees
+lag_3,0.12270236868053867,Extra_Trees

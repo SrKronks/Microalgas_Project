@@ -1,0 +1,15 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-02,OD,machine_learning,XGBoost,2026-03-24 13:01:56,0.669,0.778698205947876,-0.10969820594787594,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-03-25 12:01:45,0.765,0.6732593178749084,0.09174068212509157,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-03-26 12:09:38,0.456,0.8061190247535706,-0.35011902475357054,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-03-27 12:51:34,0.469,0.5351269841194153,-0.06612698411941531,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-03-30 12:39:11,0.694,0.5596942901611328,0.13430570983886714,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-03-31 14:37:02,0.677,0.8980340361595154,-0.22103403615951533,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-01 14:27:25,0.85,0.7835404872894287,0.06645951271057127,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-02 13:44:19,0.814,0.9325227737426758,-0.11852277374267584,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-06 14:57:18,0.68,0.8359571099281311,-0.15595710992813105,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-07 14:58:47,0.739,0.6154327988624573,0.12356720113754271,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-08 14:28:43,0.665,0.7285420894622803,-0.06354208946228024,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-09 16:17:04,0.637,0.6758614182472229,-0.03886141824722289,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-10 15:05:25,0.657,0.630540668964386,0.026459331035614042,synthetic_full_cycle,synthetic_growth_cycles
+BIM-02,OD,machine_learning,XGBoost,2026-04-13 15:24:05,0.558,0.7246212959289551,-0.16662129592895503,synthetic_full_cycle,synthetic_growth_cycles

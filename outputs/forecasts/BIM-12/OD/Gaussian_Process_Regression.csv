@@ -1,0 +1,13 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-01 14:49:40,0.674,0.6448548080796733,0.02914519192032672,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-02 14:09:21,0.657,0.7635978917983943,-0.1065978917983943,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-06 15:22:03,0.667,0.6975957750091417,-0.03059577500914168,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-07 15:18:02,0.637,0.6833478194929339,-0.04634781949293387,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-08 14:40:56,0.669,0.6393514688419265,0.029648531158073532,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-09 16:39:17,0.652,0.7001235156521344,-0.04812351565213435,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-10 15:28:16,0.647,0.6663595805769652,-0.019359580576965185,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-13 15:44:57,0.66,0.6552921755995379,0.004707824400462135,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-14 15:16:37,0.66,0.6817233855662058,-0.02172338556620579,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-15 15:12:47,0.685,0.67754843855826,0.007451561441740084,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-16 15:02:28,0.579,0.7128457178072566,-0.13384571780725663,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Gaussian_Process_Regression,2026-04-20 21:19:58,0.62,0.582579780346605,0.03742021965339504,synthetic_full_cycle,synthetic_growth_cycles

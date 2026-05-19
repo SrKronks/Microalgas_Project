@@ -1,0 +1,21 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-13,OD,machine_learning,Extra_Trees,2026-03-26 12:49:00,0.487,0.5721789759804065,-0.08517897598040647,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-03-27 13:20:00,0.544,0.5270502140127699,0.01694978598723018,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-03-30 13:02:00,0.446,0.5914041619468992,-0.14540416194689915,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-03-31 14:51:00,0.539,0.48242197148477184,0.056578028515228196,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-01 14:51:00,0.597,0.5773334594319612,0.019666540568038737,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-02 14:12:00,0.621,0.7084284985062078,-0.08742849850620782,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-06 15:24:00,0.739,0.6793174492998011,0.0596825507001989,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-07 15:20:00,0.734,0.8236820758901712,-0.08968207589017119,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-08 14:42:00,0.845,0.7949217025089887,0.050078297491011226,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-09 16:39:00,0.5,0.8684346927409977,-0.3684346927409977,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-10 15:30:00,0.534,0.5641816037945111,-0.03018160379451107,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-13 15:47:00,0.651,0.5798712838609535,0.07112871613904648,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-14 15:19:00,0.651,0.7512587689943936,-0.10025876899439357,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-15 15:14:00,0.73,0.7163803937092653,0.013619606290734665,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-16 15:04:50,0.676,0.7800172807342023,-0.10401728073420224,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-20 21:20:08,0.674,0.7420420863048239,-0.06804208630482389,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-27 16:30:31,0.577,0.6522198329451069,-0.07521983294510692,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-28 15:27:06,0.607,0.6403938889423009,-0.03339388894230089,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-04-29 15:33:16,0.605,0.7111595149518134,-0.10615951495181342,synthetic_full_cycle,synthetic_growth_cycles
+BIM-13,OD,machine_learning,Extra_Trees,2026-05-13 15:21:00,0.414,0.6129714895120396,-0.19897148951203963,synthetic_full_cycle,synthetic_growth_cycles

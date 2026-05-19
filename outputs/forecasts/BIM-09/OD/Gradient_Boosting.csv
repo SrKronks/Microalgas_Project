@@ -1,0 +1,4 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-09,OD,machine_learning,Gradient_Boosting,2026-03-31 14:47:22,0.791,0.9230013765416567,-0.13200137654165667,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Gradient_Boosting,2026-04-01 14:42:36,0.868,0.8530110623942831,0.014988937605716846,synthetic_full_cycle,synthetic_growth_cycles
+BIM-09,OD,machine_learning,Gradient_Boosting,2026-04-02 14:02:36,0.846,0.8826980713023285,-0.036698071302328494,synthetic_full_cycle,synthetic_growth_cycles

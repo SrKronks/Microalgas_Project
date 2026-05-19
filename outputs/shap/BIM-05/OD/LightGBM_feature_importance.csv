@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,2264.0,LightGBM
+lag_2,1798.0,LightGBM
+lag_3,1938.0,LightGBM

@@ -1,0 +1,5 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T2,OD,machine_learning,Ridge,2026-05-08 00:00:00,0.451,0.41008687099904667,0.04091312900095334,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Ridge,2026-05-11 00:00:00,0.624,0.4596402018706008,0.16435979812939921,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Ridge,2026-05-12 00:00:00,0.608,0.7338997862917052,-0.12589978629170517,synthetic_full_cycle,synthetic_growth_cycles
+T2,OD,machine_learning,Ridge,2026-05-13 00:00:00,0.553,0.6355591655978418,-0.08255916559784171,synthetic_full_cycle,synthetic_growth_cycles

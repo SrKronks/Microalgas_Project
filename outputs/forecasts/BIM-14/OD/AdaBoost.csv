@@ -1,0 +1,16 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-14,OD,machine_learning,AdaBoost,2026-03-27 13:21:46,0.642,0.6456079620932329,-0.003607962093232886,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-03-30 13:03:49,0.594,0.7516882900999959,-0.15768829009999596,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-03-31 14:52:45,0.702,0.6967402539246434,0.005259746075356508,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-01 14:54:33,0.689,0.8016279686953097,-0.11262796869530978,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-02 14:14:59,0.719,0.792681066584018,-0.07368106658401807,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-06 15:27:44,0.589,0.8113469816925598,-0.22234698169255984,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-07 15:22:31,0.608,0.6940196202533231,-0.0860196202533231,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-08 14:43:44,0.631,0.7160639705117863,-0.08506397051178627,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-09 16:42:01,0.622,0.729912349751777,-0.10791234975177699,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-10 15:33:07,0.648,0.7203549177677266,-0.07235491776772662,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-13 15:49:57,0.674,0.7754466055664649,-0.1014466055664649,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-14 15:22:24,0.674,0.791169545060701,-0.11716954506070099,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-15 15:16:49,0.581,0.791169545060701,-0.21016954506070107,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-16 15:06:32,0.527,0.6940196202533231,-0.16701962025332306,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,AdaBoost,2026-04-20 21:20:18,0.437,0.6069267599700251,-0.1699267599700251,synthetic_full_cycle,synthetic_growth_cycles

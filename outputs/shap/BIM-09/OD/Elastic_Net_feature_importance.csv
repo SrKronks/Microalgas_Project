@@ -1,0 +1,4 @@
+﻿feature,importance,model
+lag_1,1.0735148763138158,Elastic_Net
+lag_2,-0.0,Elastic_Net
+lag_3,-0.15979590430939236,Elastic_Net

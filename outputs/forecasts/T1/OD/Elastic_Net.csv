@@ -1,0 +1,7 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T1,OD,machine_learning,Elastic_Net,2026-05-08 00:00:00,0.502,0.5338293518108871,-0.031829351810887085,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Elastic_Net,2026-05-11 00:00:00,0.665,0.5470599453096806,0.11794005469031943,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Elastic_Net,2026-05-12 00:00:00,0.785,0.7218830742445232,0.06311692575547678,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Elastic_Net,2026-05-13 00:00:00,0.815,0.8471893495073746,-0.03218934950737462,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Elastic_Net,2026-05-14 00:00:00,0.833,0.853348063394358,-0.020348063394358018,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Elastic_Net,2026-05-15 00:00:00,0.679,0.8534958226508795,-0.17449582265087948,synthetic_full_cycle,synthetic_growth_cycles

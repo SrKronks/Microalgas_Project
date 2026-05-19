@@ -1,0 +1,16 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-14,OD,machine_learning,Ridge,2026-03-27 13:21:46,0.642,0.5974527552453438,0.04454724475465621,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-03-30 13:03:49,0.594,0.7052052875093707,-0.11120528750937075,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-03-31 14:52:45,0.702,0.596797014010577,0.1052029859894229,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-01 14:54:33,0.689,0.7686179966330948,-0.07961799663309488,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-02 14:14:59,0.719,0.7064722537499513,0.01252774625004871,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-06 15:27:44,0.589,0.7460671518308619,-0.15706715183086195,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-07 15:22:31,0.608,0.5437283944208215,0.06427160557917844,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-08 14:43:44,0.631,0.6260271119902999,0.004972888009700083,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-09 16:42:01,0.622,0.663433991923125,-0.041433991923125024,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-10 15:33:07,0.648,0.638355065473249,0.00964493452675097,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-13 15:49:57,0.674,0.6782451953267595,-0.004245195326759488,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-14 15:22:24,0.674,0.7056947198683816,-0.03169471986838157,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-15 15:16:49,0.581,0.6918191840292296,-0.11081918402922963,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-16 15:06:32,0.527,0.5532378708147551,-0.026237870814755038,synthetic_full_cycle,synthetic_growth_cycles
+BIM-14,OD,machine_learning,Ridge,2026-04-20 21:20:18,0.437,0.515149886329042,-0.07814988632904202,synthetic_full_cycle,synthetic_growth_cycles

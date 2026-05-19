@@ -1,0 +1,7 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+T1,OD,machine_learning,Linear_Regression,2026-05-08 00:00:00,0.502,0.5135380680761497,-0.011538068076149655,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Linear_Regression,2026-05-11 00:00:00,0.665,0.541175653492906,0.12382434650709406,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Linear_Regression,2026-05-12 00:00:00,0.785,0.7737925021468917,0.011207497853108372,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Linear_Regression,2026-05-13 00:00:00,0.815,0.871733989156454,-0.056733989156454,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Linear_Regression,2026-05-14 00:00:00,0.833,0.846015649165584,-0.013015649165584064,synthetic_full_cycle,synthetic_growth_cycles
+T1,OD,machine_learning,Linear_Regression,2026-05-15 00:00:00,0.679,0.8494997970318602,-0.17049979703186013,synthetic_full_cycle,synthetic_growth_cycles

@@ -1,0 +1,13 @@
+﻿BIM,target,category,model,date,y_true,y_pred,residual,validation_mode,train_source
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-01 14:49:40,0.674,0.5899035459386894,0.08409645406131061,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-02 14:09:21,0.657,0.7318131105117569,-0.07481311051175688,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-06 15:22:03,0.667,0.6837797383845186,-0.016779738384518517,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-07 15:18:02,0.637,0.679670167192489,-0.04267016719248895,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-08 14:40:56,0.669,0.6342064499842015,0.034793550015798536,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-09 16:39:17,0.652,0.6928188670746844,-0.040818867074684406,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-10 15:28:16,0.647,0.6627043278238056,-0.015704327823805597,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-13 15:44:57,0.66,0.6510560764418728,0.008943923558127231,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-14 15:16:37,0.66,0.6782313078472118,-0.01823130784721172,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-15 15:12:47,0.685,0.6749546730470031,0.01004532695299698,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-16 15:02:28,0.579,0.710457065723253,-0.131457065723253,synthetic_full_cycle,synthetic_growth_cycles
+BIM-12,OD,machine_learning,Polynomial_Regression,2026-04-20 21:19:58,0.62,0.5398617268745438,0.08013827312545618,synthetic_full_cycle,synthetic_growth_cycles
