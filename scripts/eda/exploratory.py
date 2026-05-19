@@ -8,6 +8,7 @@ import pandas as pd
 
 from scripts.preprocessing.data_loader import DataSchema
 from scripts.utils.paths import safe_name
+from scripts.utils.plot_style import PALETTE, apply_plot_style, polish_axis, save_figure, soften_spines
 
 
 def descriptive_statistics(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
@@ -83,7 +84,7 @@ def generate_eda_figures(
         return [note]
 
     saved: list[Path] = []
-    sns.set_theme(style="whitegrid", context="talk")
+    apply_plot_style()
 
     for group, frame in df.groupby(schema.group_col, dropna=False):
         bim_dir = output_dir / safe_name(group)
@@ -96,31 +97,51 @@ def generate_eda_figures(
             if series.notna().sum() < 2:
                 continue
 
-            fig, ax = plt.subplots(figsize=(11, 5))
-            ax.plot(frame[schema.date_col], series, marker="o", linewidth=2)
-            ax.set_title(f"{group} - serie temporal de {col}")
-            ax.set_xlabel("Fecha")
-            ax.set_ylabel(col)
+            fig, ax = plt.subplots(figsize=(11.5, 5.4))
+            ax.plot(
+                frame[schema.date_col],
+                series,
+                marker="o",
+                markersize=5,
+                linewidth=2.6,
+                color=PALETTE["primary"],
+            )
+            ax.fill_between(frame[schema.date_col], series, alpha=0.08, color=PALETTE["primary"])
+            polish_axis(ax, f"{group} - serie temporal de {col}", "Fecha", col)
             fig.autofmt_xdate()
             saved.extend(_save_figure(fig, bim_dir / f"{safe_name(col)}_timeseries", make_png, make_svg))
             plt.close(fig)
 
-            fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-            sns.histplot(series.dropna(), kde=True, ax=axes[0], color="#2A9D8F")
+            fig, axes = plt.subplots(1, 3, figsize=(15.5, 4.6))
+            sns.histplot(series.dropna(), kde=True, ax=axes[0], color=PALETTE["primary"], edgecolor="white", linewidth=0.7)
             axes[0].set_title("Histograma + KDE")
-            sns.boxplot(x=series, ax=axes[1], color="#E9C46A")
+            sns.boxplot(x=series, ax=axes[1], color=PALETTE["accent"], linewidth=1.2)
             axes[1].set_title("Boxplot")
-            sns.violinplot(x=series, ax=axes[2], color="#F4A261")
+            sns.violinplot(x=series, ax=axes[2], color=PALETTE["secondary"], linewidth=1.1)
             axes[2].set_title("Violin")
-            fig.suptitle(f"{group} - distribucion de {col}", y=1.03)
+            soften_spines(axes)
+            for axis in axes:
+                polish_axis(axis)
+            fig.suptitle(f"{group} - distribucion de {col}", x=0.05, y=1.03, ha="left", fontweight="bold", color=PALETTE["primary_dark"])
             saved.extend(_save_figure(fig, bim_dir / f"{safe_name(col)}_distribution", make_png, make_svg))
             plt.close(fig)
 
         numeric = frame[schema.analysis_columns].select_dtypes(include="number")
         if numeric.shape[1] >= 2 and numeric.dropna().shape[0] >= 3:
-            fig, ax = plt.subplots(figsize=(9, 7))
-            sns.heatmap(numeric.corr(), annot=True, fmt=".2f", cmap="vlag", center=0, ax=ax)
-            ax.set_title(f"{group} - matriz de correlacion")
+            fig, ax = plt.subplots(figsize=(9.5, 7.4))
+            sns.heatmap(
+                numeric.corr(),
+                annot=True,
+                fmt=".2f",
+                cmap="BrBG",
+                center=0,
+                linewidths=0.6,
+                linecolor="white",
+                square=True,
+                cbar_kws={"shrink": 0.82},
+                ax=ax,
+            )
+            ax.set_title(f"{group} - matriz de correlacion", loc="left", fontweight="bold", pad=12)
             saved.extend(_save_figure(fig, bim_dir / "correlation_heatmap", make_png, make_svg))
             plt.close(fig)
 
@@ -146,6 +167,7 @@ def generate_lag_and_rolling_plots(
         return []
 
     saved: list[Path] = []
+    apply_plot_style()
     for group, frame in df.groupby(schema.group_col, dropna=False):
         bim_dir = output_dir / safe_name(group)
         bim_dir.mkdir(parents=True, exist_ok=True)
@@ -154,19 +176,19 @@ def generate_lag_and_rolling_plots(
             series = pd.to_numeric(frame[col], errors="coerce")
             if series.notna().sum() < 4:
                 continue
-            fig, ax = plt.subplots(figsize=(5, 5))
+            fig, ax = plt.subplots(figsize=(5.6, 5.4))
             lag_plot(series.dropna(), ax=ax)
-            ax.set_title(f"{group} - lag plot {col}")
+            polish_axis(ax, f"{group} - lag plot {col}", f"{col}(t)", f"{col}(t+1)")
             saved.extend(_save_figure(fig, bim_dir / f"{safe_name(col)}_lag_plot", make_png, make_svg))
             plt.close(fig)
 
-            fig, ax = plt.subplots(figsize=(11, 5))
-            ax.plot(frame[schema.date_col], series, label=col, marker="o")
-            for window in windows:
-                ax.plot(frame[schema.date_col], series.rolling(window, min_periods=1).mean(), label=f"rolling mean {window}")
-                ax.plot(frame[schema.date_col], series.rolling(window, min_periods=2).std(), label=f"rolling std {window}")
-            ax.legend()
-            ax.set_title(f"{group} - estadisticas moviles {col}")
+            fig, ax = plt.subplots(figsize=(11.5, 5.4))
+            ax.plot(frame[schema.date_col], series, label=col, marker="o", linewidth=2.4, color=PALETTE["primary"])
+            for idx, window in enumerate(windows):
+                color = PALETTE["secondary"] if idx % 2 == 0 else PALETTE["accent"]
+                ax.plot(frame[schema.date_col], series.rolling(window, min_periods=1).mean(), label=f"media movil {window}", linewidth=2, color=color)
+                ax.plot(frame[schema.date_col], series.rolling(window, min_periods=2).std(), label=f"desv. movil {window}", linewidth=1.7, linestyle="--", color=PALETTE["muted"])
+            polish_axis(ax, f"{group} - estadisticas moviles {col}", "Fecha", col, legend=True)
             fig.autofmt_xdate()
             saved.extend(_save_figure(fig, bim_dir / f"{safe_name(col)}_rolling_statistics", make_png, make_svg))
             plt.close(fig)
@@ -174,13 +196,4 @@ def generate_lag_and_rolling_plots(
 
 
 def _save_figure(fig: object, base_path: Path, make_png: bool, make_svg: bool) -> list[Path]:
-    saved: list[Path] = []
-    if make_png:
-        png = base_path.with_suffix(".png")
-        fig.savefig(png, dpi=160, bbox_inches="tight")  # type: ignore[attr-defined]
-        saved.append(png)
-    if make_svg:
-        svg = base_path.with_suffix(".svg")
-        fig.savefig(svg, bbox_inches="tight")  # type: ignore[attr-defined]
-        saved.append(svg)
-    return saved
+    return save_figure(fig, base_path, make_png, make_svg)

@@ -8,6 +8,7 @@ import pandas as pd
 
 from scripts.preprocessing.data_loader import DataSchema
 from scripts.utils.paths import safe_name
+from scripts.utils.plot_style import apply_plot_style, polish_axis, save_figure_no_return
 
 
 def stationarity_tests(series: pd.Series) -> list[dict[str, object]]:
@@ -121,12 +122,13 @@ def _plot_acf_pacf_decomposition(
         logger.warning("Skipping temporal plots for %s/%s: %s", group, col, exc)
         return
 
+    apply_plot_style()
     lags = max(1, min(12, len(series) // 2 - 1))
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.6))
     plot_acf(series, lags=lags, ax=axes[0])
     plot_pacf(series, lags=lags, ax=axes[1], method="ywm")
-    axes[0].set_title(f"{group} - ACF {col}")
-    axes[1].set_title(f"{group} - PACF {col}")
+    polish_axis(axes[0], f"{group} - ACF {col}", "Rezago", "Correlacion")
+    polish_axis(axes[1], f"{group} - PACF {col}", "Rezago", "Correlacion parcial")
     _save(fig, output_dir / f"{safe_name(col)}_acf_pacf", make_png, make_svg)
     plt.close(fig)
 
@@ -155,7 +157,4 @@ def _plot_acf_pacf_decomposition(
 
 
 def _save(fig: object, base: Path, make_png: bool, make_svg: bool) -> None:
-    if make_png:
-        fig.savefig(base.with_suffix(".png"), dpi=160, bbox_inches="tight")  # type: ignore[attr-defined]
-    if make_svg:
-        fig.savefig(base.with_suffix(".svg"), bbox_inches="tight")  # type: ignore[attr-defined]
+    save_figure_no_return(fig, base, make_png, make_svg)

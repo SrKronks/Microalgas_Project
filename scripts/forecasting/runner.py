@@ -26,6 +26,7 @@ from scripts.synthetic.growth_cycles import SyntheticGrowthCycleGenerator
 from scripts.utils.config import ProjectConfig
 from scripts.utils.dependencies import has_module
 from scripts.utils.paths import safe_name
+from scripts.utils.plot_style import PALETTE, apply_plot_style, polish_axis, save_figure_no_return
 
 
 class ForecastRunner:
@@ -366,23 +367,18 @@ class ForecastRunner:
             import matplotlib.pyplot as plt  # type: ignore
         except Exception:
             return
+        apply_plot_style()
         make_png = bool(self.config.get("execution.make_png", True))
         make_svg = bool(self.config.get("execution.make_svg", True))
         out_dir = self.output_dirs["figures"] / safe_name(group) / "forecasts" / safe_name(target)
         out_dir.mkdir(parents=True, exist_ok=True)
-        fig, ax = plt.subplots(figsize=(11, 5))
-        ax.plot(train_frame[self.schema.date_col], train_frame[target], label="train", marker="o")
-        ax.plot(test_frame[self.schema.date_col], test_frame[target], label="test", marker="o")
-        ax.plot(test_frame[self.schema.date_col], pred, label=f"forecast {model_name}", marker="x")
-        ax.set_title(f"{group} - {target} - {model_name}")
-        ax.set_xlabel("Fecha")
-        ax.set_ylabel(target)
-        ax.legend()
+        fig, ax = plt.subplots(figsize=(11.5, 5.4))
+        ax.plot(train_frame[self.schema.date_col], train_frame[target], label="entrenamiento", marker="o", linewidth=2.4, color=PALETTE["primary"])
+        ax.plot(test_frame[self.schema.date_col], test_frame[target], label="observado", marker="o", linewidth=2.4, color=PALETTE["secondary"])
+        ax.plot(test_frame[self.schema.date_col], pred, label=f"prediccion {model_name}", marker="X", linewidth=2.5, linestyle="--", color=PALETTE["accent"])
+        polish_axis(ax, f"{group} - {target} - {model_name}", "Fecha", target, legend=True)
         fig.autofmt_xdate()
-        if make_png:
-            fig.savefig(out_dir / f"{safe_name(model_name)}.png", dpi=160, bbox_inches="tight")
-        if make_svg:
-            fig.savefig(out_dir / f"{safe_name(model_name)}.svg", bbox_inches="tight")
+        save_figure_no_return(fig, out_dir / safe_name(model_name), make_png, make_svg)
         plt.close(fig)
 
     def _plot_synthetic_validation(
@@ -398,23 +394,18 @@ class ForecastRunner:
             import matplotlib.pyplot as plt  # type: ignore
         except Exception:
             return
+        apply_plot_style()
         make_png = bool(self.config.get("execution.make_png", True))
         make_svg = bool(self.config.get("execution.make_svg", True))
         out_dir = self.output_dirs["figures"] / safe_name(group) / "forecasts" / safe_name(target)
         out_dir.mkdir(parents=True, exist_ok=True)
-        fig, ax = plt.subplots(figsize=(11, 5))
+        fig, ax = plt.subplots(figsize=(11.5, 5.4))
         real_dates = pd.to_datetime(real_frame[self.schema.date_col])
-        ax.plot(real_dates, real_frame[target], label="real cycle", marker="o")
-        ax.plot(pd.to_datetime(pred_dates), pred, label=f"synthetic-trained {model_name}", marker="x")
-        ax.set_title(f"{group} - {target} - {model_name} synthetic full-cycle validation")
-        ax.set_xlabel("Fecha")
-        ax.set_ylabel(target)
-        ax.legend()
+        ax.plot(real_dates, real_frame[target], label="ciclo real", marker="o", linewidth=2.5, color=PALETTE["primary"])
+        ax.plot(pd.to_datetime(pred_dates), pred, label=f"prediccion {model_name}", marker="X", linewidth=2.5, linestyle="--", color=PALETTE["accent"])
+        polish_axis(ax, f"{group} - {target} - {model_name} validacion ciclo completo", "Fecha", target, legend=True)
         fig.autofmt_xdate()
-        if make_png:
-            fig.savefig(out_dir / f"{safe_name(model_name)}.png", dpi=160, bbox_inches="tight")
-        if make_svg:
-            fig.savefig(out_dir / f"{safe_name(model_name)}.svg", bbox_inches="tight")
+        save_figure_no_return(fig, out_dir / safe_name(model_name), make_png, make_svg)
         plt.close(fig)
 
 
