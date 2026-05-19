@@ -42,6 +42,7 @@ class ForecastRunner:
         self.output_dirs = output_dirs
         self.logger = logger
         self.models = self._build_registry()
+        self._save_model_catalog()
         self.synthetic_generator = SyntheticGrowthCycleGenerator(config)
         self._synthetic_cache: dict[str, pd.DataFrame] = {}
 
@@ -254,24 +255,43 @@ class ForecastRunner:
         seasonal_periods = int(self.config.get("validation.seasonal_periods", 3))
         random_state = int(self.config.get("execution.random_state", 42))
         heavy = bool(self.config.get("execution.heavy_deep_learning", False))
+        hyper = self.config.get("model_hyperparameters", {}) or {}
         registry: list[ForecastModel] = []
         if enabled.get("classical", True):
-            registry.extend(get_classical_models(seasonal_periods))
+            registry.extend(get_classical_models(seasonal_periods, dict(hyper.get("classical", {}) or {})))
         if enabled.get("statistical", True):
-            registry.extend(get_statistical_models(seasonal_periods))
+            registry.extend(get_statistical_models(seasonal_periods, dict(hyper.get("statistical", {}) or {})))
         if enabled.get("biological", True):
-            registry.extend(get_biological_models())
+            registry.extend(get_biological_models(dict(hyper.get("biological", {}) or {})))
         if enabled.get("differential_equations", True):
-            registry.extend(get_differential_equation_models())
+            registry.extend(get_differential_equation_models(dict(hyper.get("differential_equations", {}) or {})))
         if enabled.get("probabilistic", True):
-            registry.extend(get_probabilistic_models())
+            registry.extend(get_probabilistic_models(dict(hyper.get("probabilistic", {}) or {}), random_state=random_state))
         if enabled.get("machine_learning", True):
-            registry.extend(get_machine_learning_models(random_state))
+            registry.extend(get_machine_learning_models(random_state, dict(hyper.get("machine_learning", {}) or {})))
         if enabled.get("deep_learning", True):
-            registry.extend(get_deep_learning_models(random_state, heavy))
+            registry.extend(get_deep_learning_models(random_state, heavy, dict(hyper.get("deep_learning", {}) or {})))
         if enabled.get("hybrid", True):
             registry.extend(get_hybrid_models())
         return registry
+
+    def _save_model_catalog(self) -> None:
+        diagnostics_dir = self.output_dirs["diagnostics"]
+        diagnostics_dir.mkdir(parents=True, exist_ok=True)
+        rows = []
+        for model in self.models:
+            card = model.model_card()
+            rows.append(
+                {
+                    "category": card["category"],
+                    "model": card["model"],
+                    "min_points": card["min_points"],
+                    "n_params": card["n_params"],
+                    "hyperparameters": json.dumps(_jsonable(card["hyperparameters"]), ensure_ascii=False),
+                }
+            )
+        pd.DataFrame(rows).to_csv(diagnostics_dir / "model_hyperparameters.csv", index=False, encoding="utf-8-sig")
+        (diagnostics_dir / "model_hyperparameters.json").write_text(json.dumps(rows, indent=2, ensure_ascii=False), encoding="utf-8")
 
     def _status_row(
         self,

@@ -34,6 +34,7 @@ class ForecastModel:
     def __init__(self) -> None:
         self.fitted_model: Any = None
         self.metadata: dict[str, Any] = {}
+        self.hyperparameters: dict[str, Any] = {}
 
     def fit_predict(
         self,
@@ -52,6 +53,15 @@ class ForecastModel:
 
     def feature_importance(self) -> pd.DataFrame:
         return pd.DataFrame()
+
+    def model_card(self) -> dict[str, Any]:
+        return {
+            "category": self.category,
+            "model": self.name,
+            "min_points": self.min_points,
+            "n_params": self.n_params,
+            "hyperparameters": self.hyperparameters,
+        }
 
 
 def require_points(series: pd.Series, min_points: int, model_name: str) -> None:

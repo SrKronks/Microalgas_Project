@@ -93,6 +93,48 @@ hibridos. Las dependencias pesadas son opcionales en ejecucion: si una libreria
 o dato biologico externo no existe, el modelo queda marcado como `skipped` y el
 pipeline continua.
 
+## Entrenamiento e hiperparametros
+
+Los hiperparametros editables estan centralizados en:
+
+```text
+configs/config.yaml
+```
+
+Apartado principal:
+
+```yaml
+model_hyperparameters:
+  machine_learning:
+    Ridge:
+      lags: 3
+      alpha: 1.0
+    Random_Forest:
+      lags: 3
+      n_estimators: 200
+  probabilistic:
+    Monte_Carlo:
+      simulations: 500
+```
+
+Durante el pipeline, los modelos supervisados por rezagos se entrenan asi:
+
+1. Se genera una matriz supervisada usando los ultimos `lags` valores del ciclo.
+2. Si `validation.strategy: synthetic_full_cycle`, el entrenamiento se hace con
+   ciclos sinteticos completos.
+3. La validacion se hace contra el ciclo real con prediccion one-step-ahead,
+   usando rezagos reales observados.
+4. Las metricas y rankings se guardan en `outputs/metrics` y
+   `outputs/rankings`.
+
+Cada ejecucion guarda el catalogo efectivo de hiperparametros en:
+
+- `outputs/diagnostics/model_hyperparameters.csv`
+- `outputs/diagnostics/model_hyperparameters.json`
+
+Esto permite verificar exactamente con que configuracion se entreno cada
+modelo.
+
 ## Validacion biologica con ciclos sinteticos
 
 Por defecto el pipeline evita el split temporal 80/20 sobre cada BIM, porque en
@@ -139,6 +181,47 @@ python -m scripts.sensitivity.decline_sensitivity --probabilities 0.4,0.7 --n-cy
 
 Esto permite correr una version minima con `pandas/numpy/openpyxl`, y una
 version completa al instalar `requirements.txt`.
+
+## Analisis de sensibilidad de hiperparametros
+
+Para evaluar sensibilidad por modelo y a nivel general del proyecto:
+
+```bash
+python -m scripts.sensitivity.hyperparameter_sensitivity --include-baseline
+```
+
+Por defecto evalua parametros relevantes como:
+
+- `Ridge.alpha`
+- `Lasso.alpha`
+- `Elastic_Net.l1_ratio`
+- `Random_Forest.n_estimators`
+- `Random_Forest.lags`
+- `SVR.C`
+- `Monte_Carlo.simulations`
+- `synthetic_training.decline_probability`
+
+Salidas principales:
+
+- `outputs/sensitivity/hyperparameters/all_model_metrics.csv`
+- `outputs/sensitivity/hyperparameters/per_model_sensitivity_summary.csv`
+- `outputs/sensitivity/hyperparameters/project_sensitivity_summary.csv`
+- `outputs/sensitivity/hyperparameters/recommended_hyperparameter_scenarios.csv`
+
+Para una prueba rapida:
+
+```bash
+python -m scripts.sensitivity.hyperparameter_sensitivity --include-baseline --n-cycles 200 --max-bims 3
+```
+
+Para definir una grilla especifica:
+
+```bash
+python -m scripts.sensitivity.hyperparameter_sensitivity \
+  --grid "machine_learning.Ridge.alpha=0.1,1,10;machine_learning.Random_Forest.lags=2,3,5" \
+  --model-groups machine_learning \
+  --n-cycles 500
+```
 
 ## Graficos de ciclos sinteticos
 

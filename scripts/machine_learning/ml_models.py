@@ -44,11 +44,13 @@ class RecursiveSklearnModel(ForecastModel):
     category = "machine_learning"
     min_points = 8
 
-    def __init__(self, name: str, estimator_factory: Callable[[], object], lags: int = 3) -> None:
+    def __init__(self, name: str, estimator_factory: Callable[[], object], lags: int = 3, estimator_params: dict[str, Any] | None = None) -> None:
         super().__init__()
         self.name = name
         self.estimator_factory = estimator_factory
         self.lags = lags
+        self.estimator_params = estimator_params or {}
+        self.hyperparameters = {"lags": lags, **self.estimator_params}
         self._synthetic_fit_key: tuple[Any, ...] | None = None
         self._synthetic_fit_metadata: dict[str, Any] = {}
 
@@ -137,7 +139,17 @@ class RecursiveSklearnModel(ForecastModel):
         return pd.DataFrame({"feature": names[: len(values)], "importance": values, "model": self.name})
 
 
-def get_machine_learning_models(random_state: int = 42) -> list[ForecastModel]:
+def get_machine_learning_models(random_state: int = 42, params: dict[str, object] | None = None) -> list[ForecastModel]:
+    params = params or {}
+
+    def cfg(model_name: str, defaults: dict[str, Any]) -> dict[str, Any]:
+        merged = defaults.copy()
+        merged.update(dict(params.get(model_name, {}) or {}))
+        return merged
+
+    def lags(model_name: str, default: int = 3) -> int:
+        return int(cfg(model_name, {"lags": default}).get("lags", default))
+
     try:
         from sklearn.cross_decomposition import PLSRegression  # type: ignore
         from sklearn.decomposition import PCA  # type: ignore
@@ -175,34 +187,55 @@ def get_machine_learning_models(random_state: int = 42) -> list[ForecastModel]:
             ]
         ]
 
+    poly = cfg("Polynomial_Regression", {"lags": 3, "degree": 2})
+    ridge = cfg("Ridge", {"lags": 3, "alpha": 1.0})
+    lasso = cfg("Lasso", {"lags": 3, "alpha": 0.001, "max_iter": 10_000})
+    elastic = cfg("Elastic_Net", {"lags": 3, "alpha": 0.001, "l1_ratio": 0.5, "max_iter": 10_000})
+    tree = cfg("Decision_Trees", {"lags": 3, "max_depth": 4})
+    rf = cfg("Random_Forest", {"lags": 3, "n_estimators": 200})
+    extra = cfg("Extra_Trees", {"lags": 3, "n_estimators": 200})
+    gb = cfg("Gradient_Boosting", {"lags": 3})
+    ada = cfg("AdaBoost", {"lags": 3})
+    svr = cfg("SVR", {"lags": 3, "C": 10.0, "epsilon": 0.01})
+    knn = cfg("KNN", {"lags": 3, "n_neighbors": 3})
+    gp = cfg("Gaussian_Process_Regression", {"lags": 3, "normalize_y": True})
+    pls = cfg("PLS", {"lags": 3, "n_components": 1})
+    pcr = cfg("PCR", {"lags": 3, "n_components": 1})
+
     models: list[ForecastModel] = [
-        RecursiveSklearnModel("Linear_Regression", lambda: LinearRegression()),
-        RecursiveSklearnModel("Polynomial_Regression", lambda: make_pipeline(PolynomialFeatures(2), LinearRegression())),
-        RecursiveSklearnModel("Ridge", lambda: Ridge(alpha=1.0, random_state=random_state)),
-        RecursiveSklearnModel("Lasso", lambda: Lasso(alpha=0.001, random_state=random_state, max_iter=10_000)),
-        RecursiveSklearnModel("Elastic_Net", lambda: ElasticNet(alpha=0.001, l1_ratio=0.5, random_state=random_state, max_iter=10_000)),
-        RecursiveSklearnModel("Decision_Trees", lambda: DecisionTreeRegressor(max_depth=4, random_state=random_state)),
-        RecursiveSklearnModel("Random_Forest", lambda: RandomForestRegressor(n_estimators=200, random_state=random_state)),
-        RecursiveSklearnModel("Extra_Trees", lambda: ExtraTreesRegressor(n_estimators=200, random_state=random_state)),
-        RecursiveSklearnModel("Gradient_Boosting", lambda: GradientBoostingRegressor(random_state=random_state)),
-        RecursiveSklearnModel("AdaBoost", lambda: AdaBoostRegressor(random_state=random_state)),
-        RecursiveSklearnModel("SVR", lambda: make_pipeline(StandardScaler(), SVR(C=10.0, epsilon=0.01))),
-        RecursiveSklearnModel("KNN", lambda: KNeighborsRegressor(n_neighbors=3)),
-        RecursiveSklearnModel("Gaussian_Process_Regression", lambda: GaussianProcessRegressor(random_state=random_state, normalize_y=True)),
-        RecursiveSklearnModel("PLS", lambda: PLSRegression(n_components=1)),
-        RecursiveSklearnModel("PCR", lambda: make_pipeline(StandardScaler(), PCA(n_components=1), LinearRegression())),
+        RecursiveSklearnModel("Linear_Regression", lambda: LinearRegression(), lags=lags("Linear_Regression"), estimator_params=cfg("Linear_Regression", {"lags": 3})),
+        RecursiveSklearnModel("Polynomial_Regression", lambda: make_pipeline(PolynomialFeatures(int(poly["degree"])), LinearRegression()), lags=int(poly["lags"]), estimator_params=poly),
+        RecursiveSklearnModel("Ridge", lambda: Ridge(alpha=float(ridge["alpha"]), random_state=random_state), lags=int(ridge["lags"]), estimator_params=ridge),
+        RecursiveSklearnModel("Lasso", lambda: Lasso(alpha=float(lasso["alpha"]), random_state=random_state, max_iter=int(lasso["max_iter"])), lags=int(lasso["lags"]), estimator_params=lasso),
+        RecursiveSklearnModel("Elastic_Net", lambda: ElasticNet(alpha=float(elastic["alpha"]), l1_ratio=float(elastic["l1_ratio"]), random_state=random_state, max_iter=int(elastic["max_iter"])), lags=int(elastic["lags"]), estimator_params=elastic),
+        RecursiveSklearnModel("Decision_Trees", lambda: DecisionTreeRegressor(max_depth=int(tree["max_depth"]), random_state=random_state), lags=int(tree["lags"]), estimator_params=tree),
+        RecursiveSklearnModel("Random_Forest", lambda: RandomForestRegressor(n_estimators=int(rf["n_estimators"]), random_state=random_state), lags=int(rf["lags"]), estimator_params=rf),
+        RecursiveSklearnModel("Extra_Trees", lambda: ExtraTreesRegressor(n_estimators=int(extra["n_estimators"]), random_state=random_state), lags=int(extra["lags"]), estimator_params=extra),
+        RecursiveSklearnModel("Gradient_Boosting", lambda: GradientBoostingRegressor(random_state=random_state), lags=int(gb["lags"]), estimator_params=gb),
+        RecursiveSklearnModel("AdaBoost", lambda: AdaBoostRegressor(random_state=random_state), lags=int(ada["lags"]), estimator_params=ada),
+        RecursiveSklearnModel("SVR", lambda: make_pipeline(StandardScaler(), SVR(C=float(svr["C"]), epsilon=float(svr["epsilon"]))), lags=int(svr["lags"]), estimator_params=svr),
+        RecursiveSklearnModel("KNN", lambda: KNeighborsRegressor(n_neighbors=int(knn["n_neighbors"])), lags=int(knn["lags"]), estimator_params=knn),
+        RecursiveSklearnModel("Gaussian_Process_Regression", lambda: GaussianProcessRegressor(random_state=random_state, normalize_y=bool(gp["normalize_y"])), lags=int(gp["lags"]), estimator_params=gp),
+        RecursiveSklearnModel("PLS", lambda: PLSRegression(n_components=int(pls["n_components"])), lags=int(pls["lags"]), estimator_params=pls),
+        RecursiveSklearnModel("PCR", lambda: make_pipeline(StandardScaler(), PCA(n_components=int(pcr["n_components"])), LinearRegression()), lags=int(pcr["lags"]), estimator_params=pcr),
     ]
 
     optional_specs = [
-        ("XGBoost", "xgboost", "XGBRegressor", {"n_estimators": 200, "random_state": random_state, "objective": "reg:squarederror"}),
-        ("LightGBM", "lightgbm", "LGBMRegressor", {"n_estimators": 200, "random_state": random_state, "verbose": -1}),
-        ("CatBoost", "catboost", "CatBoostRegressor", {"iterations": 200, "random_seed": random_state, "verbose": False}),
+        ("XGBoost", "xgboost", "XGBRegressor", cfg("XGBoost", {"lags": 3, "n_estimators": 200, "objective": "reg:squarederror"})),
+        ("LightGBM", "lightgbm", "LGBMRegressor", cfg("LightGBM", {"lags": 3, "n_estimators": 200, "verbose": -1})),
+        ("CatBoost", "catboost", "CatBoostRegressor", cfg("CatBoost", {"lags": 3, "iterations": 200, "verbose": False})),
     ]
     for model_name, module_name, class_name, kwargs in optional_specs:
         try:
             module = __import__(module_name, fromlist=[class_name])
             estimator_cls = getattr(module, class_name)
-            models.append(RecursiveSklearnModel(model_name, lambda cls=estimator_cls, kw=kwargs: cls(**kw)))
+            estimator_kwargs = dict(kwargs)
+            model_lags = int(estimator_kwargs.pop("lags", 3))
+            if model_name == "CatBoost":
+                estimator_kwargs["random_seed"] = random_state
+            else:
+                estimator_kwargs["random_state"] = random_state
+            models.append(RecursiveSklearnModel(model_name, lambda cls=estimator_cls, kw=estimator_kwargs: cls(**kw), lags=model_lags, estimator_params={**kwargs, **estimator_kwargs}))
         except Exception as exc:
             models.append(SkippedModel(model_name, "machine_learning", f"{module_name} not available: {exc}"))
     return models

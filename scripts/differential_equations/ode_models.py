@@ -4,11 +4,13 @@ from scripts.biological_models.growth_models import CurveFitGrowthModel, logisti
 from scripts.forecasting.base import ForecastModel, SkippedModel
 
 
-def get_differential_equation_models() -> list[ForecastModel]:
+def get_differential_equation_models(params: dict[str, object] | None = None) -> list[ForecastModel]:
+    params = params or {}
+    maxfev = int(dict(params.get("Curve_Fit", {}) or {}).get("maxfev", 20_000))
     models: list[ForecastModel] = [
-        CurveFitGrowthModel("ODE_Logistic", logistic, _p0_sigmoid, note="Analytical logistic ODE solution."),
-        CurveFitGrowthModel("ODE_Monod_Chemostat", monod_proxy, _p0_proxy, note="Chemostat proxy without inflow/substrate sensors."),
-        CurveFitGrowthModel("Chemostat_Model", monod_proxy, _p0_proxy, note="Chemostat proxy without dilution-rate data."),
+        CurveFitGrowthModel("ODE_Logistic", logistic, _p0_sigmoid, note="Analytical logistic ODE solution.", maxfev=maxfev),
+        CurveFitGrowthModel("ODE_Monod_Chemostat", monod_proxy, _p0_proxy, note="Chemostat proxy without inflow/substrate sensors.", maxfev=maxfev),
+        CurveFitGrowthModel("Chemostat_Model", monod_proxy, _p0_proxy, note="Chemostat proxy without dilution-rate data.", maxfev=maxfev),
         SkippedModel("PDE", "differential_equations", "PDE requires spatial grid or reactor field data."),
         SkippedModel("DDE", "differential_equations", "DDE requires explicit delay structure or delayed covariates."),
         SkippedModel("Reaction_Diffusion", "differential_equations", "Reaction-diffusion requires spatial concentration data."),

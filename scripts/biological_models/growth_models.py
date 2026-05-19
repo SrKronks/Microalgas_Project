@@ -22,6 +22,7 @@ class CurveFitGrowthModel(ForecastModel):
         p0: Callable[[np.ndarray, np.ndarray], list[float]],
         bounds: tuple[list[float], list[float]] | None = None,
         note: str | None = None,
+        maxfev: int = 20_000,
     ) -> None:
         super().__init__()
         self.name = name
@@ -29,6 +30,8 @@ class CurveFitGrowthModel(ForecastModel):
         self.p0_factory = p0
         self.bounds = bounds
         self.note = note
+        self.maxfev = maxfev
+        self.hyperparameters = {"optimizer": "scipy.curve_fit", "maxfev": maxfev, "bounds": bounds, "note": note}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -40,7 +43,7 @@ class CurveFitGrowthModel(ForecastModel):
         y = np.asarray(series, dtype=float)
         x = np.arange(len(y), dtype=float)
         p0 = self.p0_factory(x, y)
-        kwargs = {"maxfev": 20_000}
+        kwargs = {"maxfev": self.maxfev}
         if self.bounds is not None:
             kwargs["bounds"] = self.bounds
         try:
@@ -154,29 +157,31 @@ def _p0_moser(_: np.ndarray, y: np.ndarray) -> list[float]:
     return [max(float(y[0]), 1e-6), max(float(np.nanmax(y) - np.nanmin(y)), 1e-3), 1.0, 1.0]
 
 
-def get_biological_models() -> list[ForecastModel]:
+def get_biological_models(params: dict[str, object] | None = None) -> list[ForecastModel]:
+    params = params or {}
+    maxfev = int(dict(params.get("Curve_Fit", {}) or {}).get("maxfev", 20_000))
     proxy_note = "Proxy form: substrate/light/metabolic variables were not present, so elapsed time is used as proxy."
     return [
-        CurveFitGrowthModel("Exponential", exponential, _p0_exp),
-        CurveFitGrowthModel("Logistic", logistic, _p0_sigmoid),
-        CurveFitGrowthModel("Gompertz", gompertz, _p0_gompertz),
-        CurveFitGrowthModel("Richards", richards, _p0_richards),
-        CurveFitGrowthModel("Verhulst", logistic, _p0_sigmoid),
-        CurveFitGrowthModel("Baranyi", modified_gompertz, _p0_modified),
-        CurveFitGrowthModel("Bertalanffy", bertalanffy, _p0_sigmoid),
-        CurveFitGrowthModel("Monod", monod_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Droop", monod_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Contois", monod_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Haldane", haldane_proxy, _p0_haldane, note=proxy_note),
-        CurveFitGrowthModel("Andrews", haldane_proxy, _p0_haldane, note=proxy_note),
-        CurveFitGrowthModel("Tessier", tessier_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Moser", moser_proxy, _p0_moser, note=proxy_note),
-        CurveFitGrowthModel("Eilers_Peeters", light_inhibition_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Steele", light_inhibition_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Photo_Limited", monod_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Photo_Inhibited", light_inhibition_proxy, _p0_proxy, note=proxy_note),
-        CurveFitGrowthModel("Cell_Mortality", mortality_proxy, lambda x, y: [*_p0_sigmoid(x, y), 0.01]),
-        CurveFitGrowthModel("Lotka_Volterra", lotka_volterra_proxy, lambda _x, y: [max(float(y[0]), 1e-6), 0.05, 0.01]),
-        CurveFitGrowthModel("Bioenergetic_Dynamic", gompertz, _p0_gompertz, note=proxy_note),
-        CurveFitGrowthModel("Dynamic_Metabolic", richards, _p0_richards, note=proxy_note),
+        CurveFitGrowthModel("Exponential", exponential, _p0_exp, maxfev=maxfev),
+        CurveFitGrowthModel("Logistic", logistic, _p0_sigmoid, maxfev=maxfev),
+        CurveFitGrowthModel("Gompertz", gompertz, _p0_gompertz, maxfev=maxfev),
+        CurveFitGrowthModel("Richards", richards, _p0_richards, maxfev=maxfev),
+        CurveFitGrowthModel("Verhulst", logistic, _p0_sigmoid, maxfev=maxfev),
+        CurveFitGrowthModel("Baranyi", modified_gompertz, _p0_modified, maxfev=maxfev),
+        CurveFitGrowthModel("Bertalanffy", bertalanffy, _p0_sigmoid, maxfev=maxfev),
+        CurveFitGrowthModel("Monod", monod_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Droop", monod_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Contois", monod_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Haldane", haldane_proxy, _p0_haldane, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Andrews", haldane_proxy, _p0_haldane, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Tessier", tessier_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Moser", moser_proxy, _p0_moser, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Eilers_Peeters", light_inhibition_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Steele", light_inhibition_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Photo_Limited", monod_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Photo_Inhibited", light_inhibition_proxy, _p0_proxy, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Cell_Mortality", mortality_proxy, lambda x, y: [*_p0_sigmoid(x, y), 0.01], maxfev=maxfev),
+        CurveFitGrowthModel("Lotka_Volterra", lotka_volterra_proxy, lambda _x, y: [max(float(y[0]), 1e-6), 0.05, 0.01], maxfev=maxfev),
+        CurveFitGrowthModel("Bioenergetic_Dynamic", gompertz, _p0_gompertz, note=proxy_note, maxfev=maxfev),
+        CurveFitGrowthModel("Dynamic_Metabolic", richards, _p0_richards, note=proxy_note, maxfev=maxfev),
     ]

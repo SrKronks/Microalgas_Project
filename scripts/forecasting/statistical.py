@@ -23,6 +23,7 @@ class ARIMAFamily(ForecastModel):
         self.seasonal_order = seasonal_order
         self.use_exog = use_exog
         self.n_params = sum(order) + 1
+        self.hyperparameters = {"order": order, "seasonal_order": seasonal_order, "use_exog": use_exog}
 
     def fit_predict(
         self,
@@ -63,10 +64,14 @@ class VARFamily(ForecastModel):
     category = "statistical"
     min_points = 8
 
-    def __init__(self, name: str, mode: str = "var") -> None:
+    def __init__(self, name: str, mode: str = "var", maxlags: int = 2, varmax_order: tuple[int, int] = (1, 0), maxiter: int = 100) -> None:
         super().__init__()
         self.name = name
         self.mode = mode
+        self.maxlags = maxlags
+        self.varmax_order = varmax_order
+        self.maxiter = maxiter
+        self.hyperparameters = {"mode": mode, "maxlags": maxlags, "varmax_order": varmax_order, "maxiter": maxiter}
 
     def fit_predict(
         self,
@@ -91,11 +96,11 @@ class VARFamily(ForecastModel):
             raise ModelSkipped(f"statsmodels is required for {self.name}: {exc}") from exc
 
         if self.mode == "var":
-            self.fitted_model = VAR(numeric).fit(maxlags=min(2, len(numeric) // 3), ic=None)
+            self.fitted_model = VAR(numeric).fit(maxlags=min(self.maxlags, len(numeric) // 3), ic=None)
             forecast = self.fitted_model.forecast(numeric.values[-self.fitted_model.k_ar :], steps=horizon)
             return np.asarray(pd.DataFrame(forecast, columns=numeric.columns)[target], dtype=float)
         if self.mode == "varmax":
-            self.fitted_model = VARMAX(numeric, order=(1, 0), enforce_stationarity=False).fit(disp=False, maxiter=100)
+            self.fitted_model = VARMAX(numeric, order=self.varmax_order, enforce_stationarity=False).fit(disp=False, maxiter=self.maxiter)
             return np.asarray(self.fitted_model.forecast(horizon)[target], dtype=float)
         if self.mode == "vecm":
             self.fitted_model = VECM(numeric, k_ar_diff=1, coint_rank=1).fit()
@@ -107,10 +112,13 @@ class VolatilityModel(ForecastModel):
     category = "statistical"
     min_points = 10
 
-    def __init__(self, name: str, vol: str) -> None:
+    def __init__(self, name: str, vol: str, p: int = 1, q: int | None = None) -> None:
         super().__init__()
         self.name = name
         self.vol = vol
+        self.p = p
+        self.q = 1 if q is None and vol.upper() == "GARCH" else int(q or 0)
+        self.hyperparameters = {"vol": vol, "p": self.p, "q": self.q}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -122,7 +130,7 @@ class VolatilityModel(ForecastModel):
         returns = series.diff().dropna()
         if len(returns) < self.min_points:
             raise ModelSkipped("ARCH/GARCH requires enough differenced observations")
-        self.fitted_model = arch_model(returns, vol=self.vol, p=1, q=1 if self.vol.upper() == "GARCH" else 0).fit(disp="off")
+        self.fitted_model = arch_model(returns, vol=self.vol, p=self.p, q=self.q).fit(disp="off")
         mean_step = float(returns.mean())
         start = float(series.iloc[-1])
         return np.asarray([start + mean_step * step for step in range(1, horizon + 1)], dtype=float)
@@ -136,6 +144,7 @@ class StateSpaceModel(ForecastModel):
         super().__init__()
         self.name = name
         self.level = level
+        self.hyperparameters = {"level": level}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -148,7 +157,19 @@ class StateSpaceModel(ForecastModel):
         return np.asarray(self.fitted_model.forecast(horizon), dtype=float)
 
 
-def get_statistical_models(seasonal_periods: int = 3) -> list[ForecastModel]:
+def get_statistical_models(seasonal_periods: int = 3, params: dict[str, object] | None = None) -> list[ForecastModel]:
+    params = params or {}
+
+    def cfg(model_name: str, defaults: dict[str, object]) -> dict[str, object]:
+        merged = defaults.copy()
+        merged.update(dict(params.get(model_name, {}) or {}))
+        return merged
+
+    var = cfg("VAR", {"maxlags": 2})
+    varmax = cfg("VARMAX", {"varmax_order": (1, 0), "maxiter": 100})
+    arch = cfg("ARCH", {"p": 1, "q": 0})
+    garch = cfg("GARCH", {"p": 1, "q": 1})
+    state = cfg("State_Space_Model", {"level": "local linear trend"})
     return [
         ARIMAFamily("AR", (1, 0, 0)),
         ARIMAFamily("MA", (0, 0, 1)),
@@ -157,13 +178,13 @@ def get_statistical_models(seasonal_periods: int = 3) -> list[ForecastModel]:
         ARIMAFamily("SARIMA", (1, 1, 1), (1, 0, 0, max(2, seasonal_periods))),
         ARIMAFamily("ARIMAX", (1, 1, 1), None, use_exog=True),
         ARIMAFamily("SARIMAX", (1, 1, 1), (1, 0, 0, max(2, seasonal_periods)), use_exog=True),
-        VARFamily("VAR", "var"),
-        VARFamily("VARMAX", "varmax"),
+        VARFamily("VAR", "var", maxlags=int(var["maxlags"])),
+        VARFamily("VARMAX", "varmax", varmax_order=tuple(varmax["varmax_order"]), maxiter=int(varmax["maxiter"])),
         VARFamily("VECM", "vecm"),
-        VolatilityModel("ARCH", "ARCH"),
-        VolatilityModel("GARCH", "GARCH"),
-        StateSpaceModel("State_Space_Model"),
-        StateSpaceModel("Dynamic_Linear_Model"),
-        StateSpaceModel("Kalman_Filter"),
+        VolatilityModel("ARCH", "ARCH", p=int(arch["p"]), q=int(arch["q"])),
+        VolatilityModel("GARCH", "GARCH", p=int(garch["p"]), q=int(garch["q"])),
+        StateSpaceModel("State_Space_Model", level=str(state["level"])),
+        StateSpaceModel("Dynamic_Linear_Model", level=str(cfg("Dynamic_Linear_Model", {"level": "local linear trend"})["level"])),
+        StateSpaceModel("Kalman_Filter", level=str(cfg("Kalman_Filter", {"level": "local linear trend"})["level"])),
         ARIMAFamily("BSTS_proxy", (1, 1, 1)),
     ]

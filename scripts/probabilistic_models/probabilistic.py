@@ -14,6 +14,7 @@ class MarkovChainForecaster(ForecastModel):
     def __init__(self, n_states: int = 3) -> None:
         super().__init__()
         self.n_states = n_states
+        self.hyperparameters = {"n_states": n_states}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -43,6 +44,12 @@ class GaussianProcessForecaster(ForecastModel):
     category = "probabilistic"
     min_points = 6
 
+    def __init__(self, random_state: int = 42, normalize_y: bool = True) -> None:
+        super().__init__()
+        self.random_state = random_state
+        self.normalize_y = normalize_y
+        self.hyperparameters = {"random_state": random_state, "normalize_y": normalize_y, "kernel": "RBF + WhiteKernel"}
+
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
         require_points(series, self.min_points, self.name)
@@ -53,7 +60,7 @@ class GaussianProcessForecaster(ForecastModel):
             raise ModelSkipped(f"scikit-learn is required for Gaussian Processes: {exc}") from exc
         x = np.arange(len(series), dtype=float).reshape(-1, 1)
         y = series.to_numpy(dtype=float)
-        self.fitted_model = GaussianProcessRegressor(kernel=RBF() + WhiteKernel(), random_state=42, normalize_y=True)
+        self.fitted_model = GaussianProcessRegressor(kernel=RBF() + WhiteKernel(), random_state=self.random_state, normalize_y=self.normalize_y)
         self.fitted_model.fit(x, y)
         future = np.arange(len(series), len(series) + horizon, dtype=float).reshape(-1, 1)
         return np.asarray(self.fitted_model.predict(future), dtype=float)
@@ -68,6 +75,7 @@ class MonteCarloDrift(ForecastModel):
         super().__init__()
         self.simulations = simulations
         self.random_state = random_state
+        self.hyperparameters = {"simulations": simulations, "random_state": random_state}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -93,6 +101,7 @@ class ParticleFilterForecaster(ForecastModel):
         super().__init__()
         self.particles = particles
         self.random_state = random_state
+        self.hyperparameters = {"particles": particles, "random_state": random_state}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -115,6 +124,13 @@ class HMMForecaster(ForecastModel):
     category = "probabilistic"
     min_points = 10
 
+    def __init__(self, n_components: int = 3, n_iter: int = 200, random_state: int = 42) -> None:
+        super().__init__()
+        self.n_components = n_components
+        self.n_iter = n_iter
+        self.random_state = random_state
+        self.hyperparameters = {"n_components": n_components, "n_iter": n_iter, "covariance_type": "diag", "random_state": random_state}
+
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
         require_points(series, self.min_points, self.name)
@@ -123,7 +139,7 @@ class HMMForecaster(ForecastModel):
         except Exception as exc:
             raise ModelSkipped(f"hmmlearn is required for HMM: {exc}") from exc
         x = series.to_numpy(dtype=float).reshape(-1, 1)
-        self.fitted_model = GaussianHMM(n_components=min(3, len(series) // 3), covariance_type="diag", n_iter=200, random_state=42)
+        self.fitted_model = GaussianHMM(n_components=min(self.n_components, len(series) // 3), covariance_type="diag", n_iter=self.n_iter, random_state=self.random_state)
         self.fitted_model.fit(x)
         states = self.fitted_model.predict(x)
         current_state = int(states[-1])
@@ -137,17 +153,30 @@ class HMMForecaster(ForecastModel):
         return np.asarray(preds, dtype=float)
 
 
-def get_probabilistic_models() -> list[ForecastModel]:
-    smc = ParticleFilterForecaster()
+def get_probabilistic_models(params: dict[str, object] | None = None, random_state: int = 42) -> list[ForecastModel]:
+    params = params or {}
+
+    def cfg(model_name: str, defaults: dict[str, object]) -> dict[str, object]:
+        merged = defaults.copy()
+        merged.update(dict(params.get(model_name, {}) or {}))
+        return merged
+
+    hmm = cfg("Hidden_Markov_Models", {"n_components": 3, "n_iter": 200, "random_state": random_state})
+    markov = cfg("Markov_Chains", {"n_states": 3})
+    gp = cfg("Gaussian_Processes", {"random_state": random_state, "normalize_y": True})
+    pf = cfg("Particle_Filters", {"particles": 500, "random_state": random_state})
+    mc = cfg("Monte_Carlo", {"simulations": 500, "random_state": random_state})
+    smc_params = cfg("Sequential_Monte_Carlo", {"particles": 500, "random_state": random_state})
+    smc = ParticleFilterForecaster(particles=int(smc_params["particles"]), random_state=int(smc_params["random_state"]))
     smc.name = "Sequential_Monte_Carlo"
     return [
-        HMMForecaster(),
-        MarkovChainForecaster(),
+        HMMForecaster(n_components=int(hmm["n_components"]), n_iter=int(hmm["n_iter"]), random_state=int(hmm["random_state"])),
+        MarkovChainForecaster(n_states=int(markov["n_states"])),
         SkippedModel("Semi_Markov", "probabilistic", "Semi-Markov requires explicit state dwell-time labels."),
-        GaussianProcessForecaster(),
+        GaussianProcessForecaster(random_state=int(gp["random_state"]), normalize_y=bool(gp["normalize_y"])),
         SkippedModel("Bayesian_Networks", "probabilistic", "Bayesian network structure learning is available through pgmpy/pymc when installed."),
-        ParticleFilterForecaster(),
-        MonteCarloDrift(),
+        ParticleFilterForecaster(particles=int(pf["particles"]), random_state=int(pf["random_state"])),
+        MonteCarloDrift(simulations=int(mc["simulations"]), random_state=int(mc["random_state"])),
         smc,
         SkippedModel("Probabilistic_Graphical_Models", "probabilistic", "Probabilistic graphical models require structural assumptions or graph data."),
     ]

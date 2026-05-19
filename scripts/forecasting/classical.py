@@ -25,6 +25,7 @@ class MovingAverage(ForecastModel):
     def __init__(self, window: int = 3) -> None:
         super().__init__()
         self.window = window
+        self.hyperparameters = {"window": window}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         require_points(train, self.min_points, self.name)
@@ -41,6 +42,7 @@ class WeightedMovingAverage(ForecastModel):
     def __init__(self, window: int = 3) -> None:
         super().__init__()
         self.window = window
+        self.hyperparameters = {"window": window}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -72,6 +74,7 @@ class Croston(ForecastModel):
     def __init__(self, alpha: float = 0.1) -> None:
         super().__init__()
         self.alpha = alpha
+        self.hyperparameters = {"alpha": alpha}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -104,6 +107,7 @@ class StatsmodelsETS(ForecastModel):
         self.name = name
         self.mode = mode
         self.seasonal_periods = seasonal_periods
+        self.hyperparameters = {"mode": mode, "seasonal_periods": seasonal_periods}
 
     def fit_predict(self, train: pd.Series, horizon: int, **_: object) -> np.ndarray:
         series = clean_series(train)
@@ -151,11 +155,15 @@ class StatsmodelsETS(ForecastModel):
         return np.asarray(self.fitted_model.forecast(horizon), dtype=float)
 
 
-def get_classical_models(seasonal_periods: int = 3) -> list[ForecastModel]:
+def get_classical_models(seasonal_periods: int = 3, params: dict[str, object] | None = None) -> list[ForecastModel]:
+    params = params or {}
+    moving_average = dict(params.get("Moving_Average", {}) or {})
+    weighted_moving_average = dict(params.get("Weighted_Moving_Average", {}) or {})
+    croston = dict(params.get("Croston", {}) or {})
     return [
         NaiveLast(),
-        MovingAverage(window=3),
-        WeightedMovingAverage(window=3),
+        MovingAverage(window=int(moving_average.get("window", 3))),
+        WeightedMovingAverage(window=int(weighted_moving_average.get("window", 3))),
         DriftMethod(),
         StatsmodelsETS("Exponential_Smoothing", "simple", seasonal_periods),
         StatsmodelsETS("Holt", "holt", seasonal_periods),
@@ -163,6 +171,6 @@ def get_classical_models(seasonal_periods: int = 3) -> list[ForecastModel]:
         StatsmodelsETS("Holt_Winters_Multiplicative", "hw_mul", seasonal_periods),
         StatsmodelsETS("Brown_Double_Exponential", "brown", seasonal_periods),
         StatsmodelsETS("Winters", "hw_add", seasonal_periods),
-        Croston(),
+        Croston(alpha=float(croston.get("alpha", 0.1))),
         StatsmodelsETS("Theta_Method", "theta", seasonal_periods),
     ]
