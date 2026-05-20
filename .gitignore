@@ -8,7 +8,6 @@ __pycache__/
 logs/
 catboost_info/
 outputs/
-data/raw/
 data/processed/
 outputs/models/**/*.pkl
 outputs/models/**/*.joblib
