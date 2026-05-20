@@ -3,7 +3,7 @@ project:
   description: Advanced time-series analytics and forecasting for microalgae cultures.
 
 data:
-  raw_file: data/raw/historial-monitoreos-2026-05-14.xlsx
+  raw_file: data/raw/data.xlsx
   sheet_name:
   date_column:
   group_column:
@@ -71,8 +71,8 @@ models:
     lightgbm: true
     catboost: true
     prophet: true
-    darts: false
-    pymc: false
+    darts: true
+    pymc: true
 
 classification:
   enabled: true

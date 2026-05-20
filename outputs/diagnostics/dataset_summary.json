@@ -1,6 +1,6 @@
 {
   "rows": 220,
-  "columns": 18,
+  "columns": 14,
   "date_column": "Fecha",
   "group_column": "BIM",
   "numeric_columns": [
@@ -13,9 +13,7 @@
     "OD",
     "OD_Norm",
     "μ (d⁻¹)",
-    "ciclo_1",
-    "Edad_Dias",
-    "Delta_pH_1d"
+    "ciclo_1"
   ],
   "analysis_columns": [
     "pH",
@@ -25,16 +23,12 @@
     "EC",
     "EC_Norm",
     "OD",
-    "OD_Norm",
-    "Delta_pH_1d"
+    "OD_Norm"
   ],
   "target_columns": [
     "OD"
   ],
-  "label_columns": [
-    "Ritmo",
-    "Estado_Cultivo"
-  ],
+  "label_columns": [],
   "n_groups": 17,
   "groups": [
     "BIM-02",
@@ -71,10 +65,6 @@
     "OD_Norm": 15.4545,
     "μ (d⁻¹)": 18.6364,
     "ciclo_1": 34.0909,
-    "ciclo_2": 90.4545,
-    "Edad_Dias": 0.0,
-    "Delta_pH_1d": 8.6364,
-    "Ritmo": 0.0,
-    "Estado_Cultivo": 0.0
+    "ciclo_2": 90.4545
   }
 }
