@@ -17,6 +17,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "date_column": None,
         "group_column": None,
         "target_columns": ["OD"],
+        "classification_targets": ["Ritmo", "Estado_Cultivo"],
         "preferred_analysis_columns": ["OD", "pH", "EC", "Temperatura", "Temp", "mu", "growth"],
         "drop_normalized_duplicates": False,
     },
@@ -71,6 +72,15 @@ DEFAULT_CONFIG: dict[str, Any] = {
             "darts": False,
             "pymc": False,
         },
+    },
+    "classification": {
+        "enabled": True,
+        "test_fraction": 0.25,
+        "validation_strategy": "stratified_holdout",
+        "min_samples": 20,
+        "min_class_count": 2,
+        "max_missing_feature_pct": 0.60,
+        "save_models": True,
     },
     "model_hyperparameters": {
         "classical": {

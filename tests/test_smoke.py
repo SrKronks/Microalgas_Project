@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from scripts.classification.runner import ClassificationRunner
+from scripts.evaluation.metrics import classification_metrics
 from scripts.evaluation.metrics import regression_metrics
 from scripts.preprocessing.data_loader import detect_schema
 from scripts.sensitivity.decline_sensitivity import _parse_probabilities, _summarize, _winners
@@ -28,11 +30,69 @@ def test_schema_detection() -> None:
     assert "OD" in schema.target_columns
 
 
+def test_schema_detection_finds_classification_labels() -> None:
+    df = pd.DataFrame(
+        {
+            "Fecha": pd.date_range("2026-01-01", periods=6),
+            "BIM": ["BIM-1"] * 6,
+            "OD": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+            "Ritmo": ["RAPIDO", "RAPIDO", "MODERADO", "MODERADO", "DECLIVE", "DECLIVE"],
+            "Estado_Cultivo": ["CRECIMIENTO", "CRECIMIENTO", "PRODUCTO", "PRODUCTO", "DESCARTE", "DESCARTE"],
+        }
+    )
+    config = ProjectConfig(raw=DEFAULT_CONFIG, root=Path("."))
+    schema = detect_schema(df, config, __import__("logging").getLogger("test"))
+    assert schema.label_columns == ["Ritmo", "Estado_Cultivo"]
+
+
 def test_metrics_are_finite_for_good_forecast() -> None:
     metrics = regression_metrics([1, 2, 3], [1, 2, 3])
     assert metrics["RMSE"] == 0
     assert metrics["MAE"] == 0
     assert metrics["R2"] == 1
+
+
+def test_classification_metrics_are_finite_for_good_classifier() -> None:
+    metrics = classification_metrics(["A", "B", "A"], ["A", "B", "A"], labels=["A", "B"])
+    assert metrics["Accuracy"] == 1
+    assert metrics["Macro_F1"] == 1
+
+
+def test_classification_runner_outputs_rankings(tmp_path: Path) -> None:
+    n = 36
+    df = pd.DataFrame(
+        {
+            "Fecha": pd.date_range("2026-01-01", periods=n),
+            "BIM": [f"BIM-{idx % 3}" for idx in range(n)],
+            "OD": [0.2 + idx * 0.02 for idx in range(n)],
+            "pH": [7.0 + (idx % 6) * 0.05 for idx in range(n)],
+            "Ritmo": ["RAPIDO" if idx % 3 == 0 else "MODERADO" if idx % 3 == 1 else "DECLIVE" for idx in range(n)],
+            "Estado_Cultivo": ["CRECIMIENTO" if idx % 2 == 0 else "PRODUCTO" for idx in range(n)],
+        }
+    )
+    raw = deepcopy(DEFAULT_CONFIG)
+    raw["classification"]["min_samples"] = 12
+    raw["classification"]["save_models"] = False
+    config = ProjectConfig(raw=raw, root=tmp_path)
+    schema = detect_schema(df, config, __import__("logging").getLogger("test"))
+    dirs = {
+        "metrics": tmp_path / "outputs" / "metrics",
+        "rankings": tmp_path / "outputs" / "rankings",
+        "diagnostics": tmp_path / "outputs" / "diagnostics",
+        "models": tmp_path / "outputs" / "models",
+    }
+    metrics, rankings, predictions, confusion = ClassificationRunner(
+        config,
+        schema,
+        dirs,
+        __import__("logging").getLogger("test"),
+    ).run(df)
+
+    assert not metrics.empty
+    assert metrics["status"].eq("ok").any()
+    assert not rankings.empty
+    assert not predictions.empty
+    assert not confusion.empty
 
 
 def test_synthetic_growth_cycles_are_complete() -> None:

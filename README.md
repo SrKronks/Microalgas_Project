@@ -8,6 +8,10 @@ calidad de datos, estadistica descriptiva, diagnosticos temporales,
 analisis multivariado, entrenamiento de modelos, ranking y reportes
 automaticos.
 
+Si el dataset incluye etiquetas categoricas como `Ritmo` y
+`Estado_Cultivo`, el pipeline tambien entrena clasificadores para esas
+etiquetas y genera metricas especificas de clasificacion.
+
 ## Estructura
 
 ```text
@@ -254,6 +258,43 @@ python -m scripts.synthetic.plot_examples --input data/processed/synthetic_growt
 - `outputs/rankings/model_rankings.csv`
 - `outputs/metrics/model_metrics.csv`
 - `outputs/forecasts/all_forecasts.csv`
+
+## Clasificacion de estado y ritmo
+
+Para datasets clasificados, configura las etiquetas en:
+
+```yaml
+data:
+  classification_targets:
+    - Ritmo
+    - Estado_Cultivo
+```
+
+El pipeline entrena una rama supervisada para cada etiqueta usando las
+variables numericas y features temporales disponibles. Por defecto usa
+validacion `stratified_holdout` para preservar la proporcion de clases. Si
+`scikit-learn` esta disponible, usa modelos como regresion logistica, Random
+Forest, Extra Trees, Gradient Boosting, SVC y Naive Bayes. Si no esta
+disponible, ejecuta clasificadores NumPy de respaldo para no perder la corrida.
+
+Salidas principales:
+
+- `outputs/metrics/classification_metrics.csv`
+- `outputs/metrics/classification_predictions.csv`
+- `outputs/rankings/classification_rankings.csv`
+- `outputs/diagnostics/classification_confusion_matrices.csv`
+- `outputs/diagnostics/classification_feature_importance.csv`
+- hojas `Class_Metrics`, `Class_Rankings`, `Class_Predictions` y
+  `Class_Confusion` en el Excel consolidado.
+
+Metricas incluidas:
+
+- Accuracy
+- Balanced Accuracy
+- Macro Precision / Recall / F1
+- Weighted F1
+- Cohen Kappa
+- LogLoss cuando el modelo entrega probabilidades
 
 ## Configuracion
 

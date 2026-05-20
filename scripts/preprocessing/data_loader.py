@@ -20,6 +20,7 @@ class DataSchema:
     numeric_columns: list[str]
     analysis_columns: list[str]
     target_columns: list[str]
+    label_columns: list[str]
     categorical_columns: list[str]
 
 
@@ -87,12 +88,23 @@ def detect_schema(df: pd.DataFrame, config: ProjectConfig, logger: logging.Logge
         od_col = _first_matching_column(numeric_columns, ["od", "absorbancia", "absorbance"])
         target_columns = [od_col] if od_col else analysis_columns[:1]
 
+    configured_labels = list(config.get("data.classification_targets", []) or [])
+    label_columns = [col for col in configured_labels if col in df.columns]
+    if not label_columns:
+        detected_labels = []
+        for pattern in ["estado", "ritmo"]:
+            match = _first_matching_column(categorical_columns, [pattern])
+            if match and match not in detected_labels:
+                detected_labels.append(match)
+        label_columns = detected_labels
+
     logger.info(
-        "Detected schema date=%s group=%s numeric=%d targets=%s",
+        "Detected schema date=%s group=%s numeric=%d targets=%s labels=%s",
         date_col,
         group_col,
         len(numeric_columns),
         target_columns,
+        label_columns,
     )
     return DataSchema(
         date_col=date_col,
@@ -100,6 +112,7 @@ def detect_schema(df: pd.DataFrame, config: ProjectConfig, logger: logging.Logge
         numeric_columns=numeric_columns,
         analysis_columns=analysis_columns,
         target_columns=target_columns,
+        label_columns=label_columns,
         categorical_columns=categorical_columns,
     )
 
@@ -114,6 +127,7 @@ def summarize_dataset(df: pd.DataFrame, schema: DataSchema) -> dict[str, object]
         "numeric_columns": schema.numeric_columns,
         "analysis_columns": schema.analysis_columns,
         "target_columns": schema.target_columns,
+        "label_columns": schema.label_columns,
         "n_groups": int(df[schema.group_col].nunique(dropna=True)),
         "groups": sorted(map(str, df[schema.group_col].dropna().unique())),
         "date_min": str(dates.min()) if not dates.isna().all() else None,

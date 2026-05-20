@@ -8,6 +8,7 @@ from typing import Any
 
 import pandas as pd
 
+from scripts.classification.runner import ClassificationRunner
 from scripts.eda.exploratory import generate_eda_figures, generate_lag_and_rolling_plots, save_descriptive_by_group
 from scripts.evaluation.metrics import rank_models
 from scripts.feature_engineering.features import FeatureEngineer
@@ -112,6 +113,13 @@ def main() -> None:
     rankings.to_csv(rankings_path, index=False, encoding="utf-8-sig")
     logger.info("Rankings saved: %s", rankings_path)
 
+    classification_metrics, classification_rankings, classification_predictions, classification_confusion = ClassificationRunner(
+        config,
+        schema,
+        dirs,
+        logger,
+    ).run(features)
+
     reports = ReportBuilder(config, dirs, logger).build(
         dataset_summary=summary,
         dependency_summary=deps.to_dict(),
@@ -120,6 +128,10 @@ def main() -> None:
         metrics=metrics,
         rankings=rankings,
         forecasts=forecasts,
+        classification_metrics=classification_metrics,
+        classification_rankings=classification_rankings,
+        classification_predictions=classification_predictions,
+        classification_confusion=classification_confusion,
     )
     logger.info("Pipeline completed. Reports: %s", reports)
 

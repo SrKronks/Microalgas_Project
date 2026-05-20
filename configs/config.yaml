@@ -9,6 +9,9 @@ data:
   group_column:
   target_columns:
     - OD
+  classification_targets:
+    - Ritmo
+    - Estado_Cultivo
   preferred_analysis_columns:
     - OD
     - pH
@@ -70,6 +73,15 @@ models:
     prophet: true
     darts: false
     pymc: false
+
+classification:
+  enabled: true
+  test_fraction: 0.25
+  validation_strategy: stratified_holdout
+  min_samples: 20
+  min_class_count: 2
+  max_missing_feature_pct: 0.60
+  save_models: true
 
 model_hyperparameters:
   classical:

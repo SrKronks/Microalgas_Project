@@ -26,23 +26,44 @@ class ReportBuilder:
         metrics: pd.DataFrame,
         rankings: pd.DataFrame,
         forecasts: pd.DataFrame,
+        classification_metrics: pd.DataFrame | None = None,
+        classification_rankings: pd.DataFrame | None = None,
+        classification_predictions: pd.DataFrame | None = None,
+        classification_confusion: pd.DataFrame | None = None,
     ) -> dict[str, Path]:
+        classification_metrics = classification_metrics if classification_metrics is not None else pd.DataFrame()
+        classification_rankings = classification_rankings if classification_rankings is not None else pd.DataFrame()
+        classification_predictions = classification_predictions if classification_predictions is not None else pd.DataFrame()
+        classification_confusion = classification_confusion if classification_confusion is not None else pd.DataFrame()
         reports_dir = self.output_dirs["reports"]
         reports_dir.mkdir(parents=True, exist_ok=True)
         artifacts: dict[str, Path] = {}
         if self.config.get("reporting.export_html", True):
             html_path = reports_dir / "microalgas_report.html"
             html_path.write_text(
-                self._html(dataset_summary, dependency_summary, quality, descriptive, metrics, rankings),
+                self._html(dataset_summary, dependency_summary, quality, descriptive, metrics, rankings, classification_metrics, classification_rankings),
                 encoding="utf-8",
             )
             dashboard_path = reports_dir / "dashboard_summary.html"
-            dashboard_path.write_text(self._dashboard(metrics, rankings, dataset_summary), encoding="utf-8")
+            dashboard_path.write_text(self._dashboard(metrics, rankings, dataset_summary, classification_metrics, classification_rankings), encoding="utf-8")
             artifacts["html_report"] = html_path
             artifacts["dashboard"] = dashboard_path
         if self.config.get("reporting.export_excel", True):
             excel_path = reports_dir / "microalgas_consolidated_results.xlsx"
-            self._excel(excel_path, dataset_summary, dependency_summary, quality, descriptive, metrics, rankings, forecasts)
+            self._excel(
+                excel_path,
+                dataset_summary,
+                dependency_summary,
+                quality,
+                descriptive,
+                metrics,
+                rankings,
+                forecasts,
+                classification_metrics,
+                classification_rankings,
+                classification_predictions,
+                classification_confusion,
+            )
             artifacts["excel"] = excel_path
         if self.config.get("reporting.export_pdf", True) and self.config.get("execution.make_pdf", True):
             pdf_path = reports_dir / "microalgas_report.pdf"
@@ -59,6 +80,8 @@ class ReportBuilder:
         descriptive: pd.DataFrame,
         metrics: pd.DataFrame,
         rankings: pd.DataFrame,
+        classification_metrics: pd.DataFrame,
+        classification_rankings: pd.DataFrame,
     ) -> str:
         title = self.config.get("reporting.title", "Microalgae report")
         best = rankings.head(20) if not rankings.empty else pd.DataFrame()
@@ -96,6 +119,8 @@ class ReportBuilder:
   </div>
   <h2>Variables objetivo</h2>
   <p><code>{', '.join(map(str, dataset_summary.get('target_columns', [])))}</code></p>
+  <h2>Etiquetas de clasificacion</h2>
+  <p><code>{', '.join(map(str, dataset_summary.get('label_columns', [])))}</code></p>
   <h2>Estado de dependencias</h2>
   {_dict_table(dependency_summary)}
   <h2>Calidad de datos</h2>
@@ -108,14 +133,27 @@ class ReportBuilder:
   {_df_table(validation_modes)}
   <h2>Top modelos por BIM y objetivo</h2>
   {_df_table(best)}
+  <h2>Metricas de clasificacion</h2>
+  {_df_table(classification_metrics)}
+  <h2>Top clasificadores</h2>
+  {_df_table(classification_rankings.head(20))}
 </body>
 </html>"""
 
-    def _dashboard(self, metrics: pd.DataFrame, rankings: pd.DataFrame, dataset_summary: dict[str, Any]) -> str:
+    def _dashboard(
+        self,
+        metrics: pd.DataFrame,
+        rankings: pd.DataFrame,
+        dataset_summary: dict[str, Any],
+        classification_metrics: pd.DataFrame,
+        classification_rankings: pd.DataFrame,
+    ) -> str:
         ok = int(metrics["status"].eq("ok").sum()) if "status" in metrics else 0
         failed = int(metrics["status"].eq("failed").sum()) if "status" in metrics else 0
         skipped = int(metrics["status"].eq("skipped").sum()) if "status" in metrics else 0
         best_model = rankings.iloc[0].to_dict() if not rankings.empty else {}
+        best_classifier = classification_rankings.iloc[0].to_dict() if not classification_rankings.empty else {}
+        classifiers_ok = int(classification_metrics["status"].eq("ok").sum()) if "status" in classification_metrics else 0
         validation_mode = metrics["validation_mode"].dropna().iloc[0] if "validation_mode" in metrics and not metrics["validation_mode"].dropna().empty else "n/a"
         return f"""<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><title>Dashboard Microalgas</title>
@@ -126,9 +164,12 @@ class ReportBuilder:
 <div class="kpi"><b>Modelos OK</b><br>{ok}</div>
 <div class="kpi"><b>Omitidos</b><br>{skipped}</div>
 <div class="kpi"><b>Fallidos</b><br>{failed}</div>
+<div class="kpi"><b>Clasificadores OK</b><br>{classifiers_ok}</div>
 <div class="kpi"><b>Validacion</b><br>{validation_mode}</div>
 <h2>Mejor modelo global</h2>
 {_dict_table(best_model)}
+<h2>Mejor clasificador global</h2>
+{_dict_table(best_classifier)}
 </body></html>"""
 
     def _excel(
@@ -141,6 +182,10 @@ class ReportBuilder:
         metrics: pd.DataFrame,
         rankings: pd.DataFrame,
         forecasts: pd.DataFrame,
+        classification_metrics: pd.DataFrame,
+        classification_rankings: pd.DataFrame,
+        classification_predictions: pd.DataFrame,
+        classification_confusion: pd.DataFrame,
     ) -> None:
         with pd.ExcelWriter(path, engine="openpyxl") as writer:
             dataset_rows = [{"key": key, "value": _cell_value(value)} for key, value in dataset_summary.items()]
@@ -152,6 +197,10 @@ class ReportBuilder:
             metrics.to_excel(writer, sheet_name="Metrics", index=False)
             rankings.to_excel(writer, sheet_name="Rankings", index=False)
             forecasts.head(100_000).to_excel(writer, sheet_name="Forecasts", index=False)
+            classification_metrics.to_excel(writer, sheet_name="Class_Metrics", index=False)
+            classification_rankings.to_excel(writer, sheet_name="Class_Rankings", index=False)
+            classification_predictions.head(100_000).to_excel(writer, sheet_name="Class_Predictions", index=False)
+            classification_confusion.to_excel(writer, sheet_name="Class_Confusion", index=False)
 
     def _pdf(self, path: Path, dataset_summary: dict[str, Any], metrics: pd.DataFrame, rankings: pd.DataFrame) -> bool:
         try:

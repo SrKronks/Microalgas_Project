@@ -4,11 +4,14 @@
 </head><body>
 <h1>Dashboard resumen</h1>
 <div class="kpi"><b>BIM</b><br>17</div>
-<div class="kpi"><b>Modelos OK</b><br>266</div>
-<div class="kpi"><b>Omitidos</b><br>1604</div>
+<div class="kpi"><b>Modelos OK</b><br>0</div>
+<div class="kpi"><b>Omitidos</b><br>1870</div>
 <div class="kpi"><b>Fallidos</b><br>0</div>
+<div class="kpi"><b>Clasificadores OK</b><br>6</div>
 <div class="kpi"><b>Validacion</b><br>synthetic_full_cycle</div>
 <h2>Mejor modelo global</h2>
+<p>No hay datos disponibles.</p>
+<h2>Mejor clasificador global</h2>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -18,20 +21,12 @@
   </thead>
   <tbody>
     <tr>
-      <td>BIM</td>
-      <td>BIM-02</td>
-    </tr>
-    <tr>
-      <td>target</td>
-      <td>OD</td>
-    </tr>
-    <tr>
-      <td>category</td>
-      <td>machine_learning</td>
+      <td>label_target</td>
+      <td>Estado_Cultivo</td>
     </tr>
     <tr>
       <td>model</td>
-      <td>Lasso</td>
+      <td>Fallback_Centroid</td>
     </tr>
     <tr>
       <td>status</td>
@@ -39,91 +34,91 @@
     </tr>
     <tr>
       <td>fit_seconds</td>
-      <td>0.42267951800022274</td>
+      <td>0.003554100010660477</td>
     </tr>
     <tr>
       <td>error</td>
       <td>NaN</td>
     </tr>
     <tr>
-      <td>RMSE</td>
-      <td>0.1350223442647355</td>
+      <td>Accuracy</td>
+      <td>0.41818181818181815</td>
     </tr>
     <tr>
-      <td>MAE</td>
-      <td>0.10563774546096973</td>
+      <td>Balanced_Accuracy</td>
+      <td>0.4765306122448979</td>
     </tr>
     <tr>
-      <td>MAPE</td>
-      <td>17.141734397832842</td>
+      <td>Macro_Precision</td>
+      <td>0.4244897959183674</td>
     </tr>
     <tr>
-      <td>SMAPE</td>
-      <td>15.67130636610674</td>
+      <td>Macro_Recall</td>
+      <td>0.4765306122448979</td>
     </tr>
     <tr>
-      <td>R2</td>
-      <td>-0.5238476547250346</td>
+      <td>Macro_F1</td>
+      <td>0.3875259194586925</td>
     </tr>
     <tr>
-      <td>Adjusted_R2</td>
-      <td>-0.6508349592854541</td>
+      <td>Weighted_F1</td>
+      <td>0.43183276616431693</td>
     </tr>
     <tr>
-      <td>AIC</td>
-      <td>-14.334541102955527</td>
+      <td>Cohen_Kappa</td>
+      <td>0.32072558857583944</td>
     </tr>
     <tr>
-      <td>BIC</td>
-      <td>-13.695483773340268</td>
-    </tr>
-    <tr>
-      <td>LogLikelihood</td>
-      <td>8.167270551477763</td>
+      <td>LogLoss</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <td>validation_mode</td>
-      <td>synthetic_full_cycle</td>
-    </tr>
-    <tr>
-      <td>train_source</td>
-      <td>synthetic_growth_cycles</td>
+      <td>stratified_holdout_numpy</td>
     </tr>
     <tr>
       <td>train_points</td>
-      <td>40316.0</td>
+      <td>165</td>
     </tr>
     <tr>
       <td>test_points</td>
-      <td>14.0</td>
+      <td>55</td>
     </tr>
     <tr>
-      <td>metadata</td>
-      <td>{"lags": 3, "train_source": "synthetic_growth_cycles", "synthetic_cycles": 2000, "synthetic_samples": 34316, "prediction_protocol": "one_step_ahead_with_observed_real_lags", "validation_mode": "full_real_cycle_walk_forward", "validation_points": 14, "warmup_points": 3}</td>
+      <td>n_classes</td>
+      <td>7</td>
     </tr>
     <tr>
-      <td>RMSE_rank</td>
+      <td>classes</td>
+      <td>["CRECIMIENTO", "DESCARTE", "INOCULO_CLIENTE", "INOCULO_PLANTA", "OBSERVACION", "PRODUCTO", "SIN_CLASIFICAR"]</td>
+    </tr>
+    <tr>
+      <td>baseline_majority_accuracy</td>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <td>feature_count</td>
+      <td>96</td>
+    </tr>
+    <tr>
+      <td>Macro_F1_rank</td>
       <td>1.0</td>
     </tr>
     <tr>
-      <td>MAE_rank</td>
+      <td>Balanced_Accuracy_rank</td>
       <td>1.0</td>
     </tr>
     <tr>
-      <td>SMAPE_rank</td>
+      <td>Weighted_F1_rank</td>
       <td>1.0</td>
     </tr>
     <tr>
-      <td>AIC_rank</td>
+      <td>Accuracy_rank</td>
       <td>1.0</td>
     </tr>
     <tr>
-      <td>BIC_rank</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <td>R2_rank</td>
-      <td>1.0</td>
+      <td>LogLoss_rank</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <td>mean_rank</td>
