@@ -51,10 +51,25 @@ synthetic_training:
   n_cycles: 2000
   min_cycle_points: 8
   max_cycle_points: 32
+  ratios_to_evaluate:
+    - 0
+    - 1
+    - 2
+    - 5
+    - 10
   noise_fraction: 0.035
+  noise_fraction_grid:
+    - 0.01
+    - 0.03
+    - 0.05
+    - 0.10
   decline_probability: 0.70
   seasonality_probability: 0.45
   save_dataset: true
+  quality:
+    enabled: true
+    max_ks_value: 0.35
+    max_out_of_real_range_pct: 15.0
 
 models:
   enabled_groups:
@@ -81,7 +96,38 @@ classification:
   min_samples: 20
   min_class_count: 2
   max_missing_feature_pct: 0.60
+  confidence_threshold: 0.65
+  use_probabilities_as_regression_context: true
   save_models: true
+
+sensitivity:
+  enabled: true
+  default_grid:
+    synthetic_training.noise_fraction:
+      - 0.01
+      - 0.03
+      - 0.05
+      - 0.10
+    synthetic_training.decline_probability:
+      - 0.40
+      - 0.70
+      - 0.90
+    machine_learning.Random_Forest.n_estimators:
+      - 100
+      - 300
+      - 600
+    machine_learning.Random_Forest.lags:
+      - 2
+      - 3
+      - 5
+    machine_learning.Elastic_Net.alpha:
+      - 0.0001
+      - 0.001
+      - 0.01
+    machine_learning.Elastic_Net.l1_ratio:
+      - 0.2
+      - 0.5
+      - 0.8
 
 model_hyperparameters:
   classical:

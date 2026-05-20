@@ -59,10 +59,7 @@ class SyntheticGrowthCycleGenerator:
                 )
 
         synthetic = pd.DataFrame(rows)
-        synthetic.attrs["synthetic_id"] = (
-            f"{target}:{profile.random_state}:{profile.n_cycles}:"
-            f"{profile.min_points}-{profile.max_points}"
-        )
+        synthetic.attrs["synthetic_id"] = f"{target}:{_series_signature(observed_values)}:{profile.random_state}:{profile.n_cycles}:{profile.min_points}-{profile.max_points}"
         return synthetic
 
     def _profile(self, observed_values: pd.Series, observed_lengths: Iterable[int]) -> SyntheticGrowthProfile:
@@ -178,3 +175,11 @@ def _cfg(config: Any, dotted_key: str, default: Any) -> Any:
     if hasattr(config, "get"):
         return config.get(dotted_key, default)
     return default
+
+
+def _series_signature(values: pd.Series) -> str:
+    clean = pd.to_numeric(values, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna().to_numpy(dtype=float)
+    if len(clean) == 0:
+        return "empty"
+    q05, q50, q95 = np.quantile(clean, [0.05, 0.50, 0.95])
+    return f"n{len(clean)}_m{np.mean(clean):.6g}_s{np.std(clean):.6g}_q{q05:.6g}_{q50:.6g}_{q95:.6g}"

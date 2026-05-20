@@ -34,24 +34,41 @@ tests/                     Tests de humo
 
 Con `venv`:
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+```powershell
+.\setup_venv.bat
 ```
 
-Para una instalacion ligera de desarrollo/EDA:
+Activar en PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+.\venv\Scripts\activate
+```
+
+Activar en `cmd.exe`:
+
+```bat
+venv\Scripts\activate.bat
+```
+
+Tambien puedes abrir una consola `cmd` ya activada con:
+
+```bat
+activar_venv.bat
+```
+
+Para instalar todas las dependencias opcionales:
 
 ```bash
-pip install -r requirements-minimal.txt
+python -m pip install -r requirements.txt
 ```
 
 En Linux/macOS:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+python -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
 Con Conda:
@@ -65,6 +82,14 @@ conda activate microalgas-project
 
 ```bash
 python main.py
+```
+
+En Windows, si quieres probar el entorno:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+.\venv\Scripts\activate
+python -m pytest -q
 ```
 
 El archivo esperado por defecto es:

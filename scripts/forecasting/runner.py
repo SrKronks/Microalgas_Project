@@ -23,6 +23,7 @@ from scripts.machine_learning.ml_models import get_machine_learning_models
 from scripts.preprocessing.data_loader import DataSchema
 from scripts.probabilistic_models.probabilistic import get_probabilistic_models
 from scripts.synthetic.growth_cycles import SyntheticGrowthCycleGenerator
+from scripts.synthetic.quality import evaluate_synthetic_cycles
 from scripts.utils.config import ProjectConfig
 from scripts.utils.dependencies import has_module
 from scripts.utils.paths import safe_name
@@ -58,8 +59,7 @@ class ForecastRunner:
         for group, frame in groups:
             for target in self.schema.target_columns:
                 if synthetic_mode:
-                    synthetic_cycles = self._synthetic_cycles_for_target(df, target)
-                    metrics, forecasts = self._run_synthetic_group_target(str(group), frame, target, synthetic_cycles)
+                    metrics, forecasts = self._run_synthetic_group_target(str(group), frame, target)
                 else:
                     metrics, forecasts = self._run_group_target(str(group), frame, target)
                 metric_rows.extend(metrics)
@@ -81,7 +81,6 @@ class ForecastRunner:
         group: str,
         frame: pd.DataFrame,
         target: str,
-        synthetic_cycles: pd.DataFrame,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         metrics: list[dict[str, Any]] = []
         forecasts: list[dict[str, Any]] = []
@@ -91,20 +90,28 @@ class ForecastRunner:
         frame = frame.sort_values(self.schema.date_col).copy()
         frame[target] = pd.to_numeric(frame[target], errors="coerce")
         valid = frame.dropna(subset=[target, self.schema.date_col]).copy()
-        if len(valid) <= 1:
-            metrics.append(self._status_row(group, target, "pipeline", "synthetic_full_cycle", "skipped", 0, "too_few_real_points"))
+        n = len(valid)
+        min_train = int(self.config.get("execution.min_train_points", 5))
+        if n <= min_train:
+            metrics.append(self._status_row(group, target, "pipeline", "TSTR_temporal_holdout", "skipped", 0, "too_few_real_points"))
             return metrics, forecasts
 
-        validation = pd.Series(
-            valid[target].to_numpy(dtype=float),
-            index=pd.to_datetime(valid[self.schema.date_col]),
-            name=target,
-        )
+        configured_horizon = int(self.config.get("execution.forecast_horizon", 5))
+        fraction_horizon = max(1, int(math.ceil(n * float(self.config.get("execution.test_fraction", 0.25)))))
+        test_size = min(configured_horizon, fraction_horizon, n - min_train)
+        train_frame = valid.iloc[:-test_size].copy()
+        test_frame = valid.iloc[-test_size:].copy()
+        train = pd.Series(train_frame[target].to_numpy(dtype=float), index=pd.to_datetime(train_frame[self.schema.date_col]), name=target)
+        y_true_holdout = test_frame[target].to_numpy(dtype=float)
+        test_dates = pd.to_datetime(test_frame[self.schema.date_col])
+        synthetic_cycles = self._synthetic_cycles_for_training_segment(train_frame, target, group)
+        self._save_synthetic_quality(group, target, train, synthetic_cycles)
         self.logger.info(
-            "Synthetic training validation for BIM=%s target=%s real_points=%d synthetic_cycles=%d",
+            "Synthetic training holdout for BIM=%s target=%s train_real=%d test_real=%d synthetic_cycles=%d",
             group,
             target,
-            len(validation),
+            len(train),
+            len(test_frame),
             int(synthetic_cycles["cycle_id"].nunique()) if "cycle_id" in synthetic_cycles else 0,
         )
 
@@ -114,6 +121,10 @@ class ForecastRunner:
                 synthetic_method = getattr(model, "fit_predict_from_synthetic", None)
                 if not callable(synthetic_method):
                     raise ModelSkipped("model does not implement synthetic-cycle training")
+                lags = max(1, int(getattr(model, "lags", self.config.get("model_hyperparameters.machine_learning.Linear_Regression.lags", 3))))
+                if len(train) < lags:
+                    raise ModelSkipped(f"requires at least {lags} real warmup points")
+                validation = pd.concat([train.tail(lags), pd.Series(y_true_holdout, index=test_dates, name=target)])
                 pred, y_true, test_dates = synthetic_method(
                     synthetic_cycles,
                     validation,
@@ -128,10 +139,12 @@ class ForecastRunner:
                 metric = regression_metrics(y_true, pred, n_params=getattr(model, "n_params", 1))
                 row = self._status_row(group, target, model.category, model.name, "ok", elapsed, None)
                 row.update(metric)
-                row["validation_mode"] = "synthetic_full_cycle"
-                row["train_source"] = "synthetic_growth_cycles"
+                row["validation_mode"] = "TSTR_temporal_holdout"
+                row["train_source"] = "synthetic_growth_cycles_from_real_train"
                 row["train_points"] = int(len(synthetic_cycles))
                 row["test_points"] = int(len(y_true))
+                row["real_train_points"] = int(len(train))
+                row["real_test_points"] = int(len(y_true_holdout))
                 row["metadata"] = json.dumps(_jsonable(model.metadata), ensure_ascii=False)
                 metrics.append(row)
                 forecasts.extend(
@@ -142,8 +155,8 @@ class ForecastRunner:
                         test_dates,
                         y_true,
                         pred,
-                        validation_mode="synthetic_full_cycle",
-                        train_source="synthetic_growth_cycles",
+                        validation_mode="TSTR_temporal_holdout",
+                        train_source="synthetic_growth_cycles_from_real_train",
                     )
                 )
                 self._save_model_artifact(model, group, target)
@@ -152,15 +165,19 @@ class ForecastRunner:
             except ModelSkipped as exc:
                 elapsed = time.perf_counter() - started
                 row = self._status_row(group, target, model.category, model.name, "skipped", elapsed, str(exc))
-                row["validation_mode"] = "synthetic_full_cycle"
-                row["train_source"] = "synthetic_growth_cycles"
+                row["validation_mode"] = "TSTR_temporal_holdout"
+                row["train_source"] = "synthetic_growth_cycles_from_real_train"
+                row["real_train_points"] = int(len(train))
+                row["real_test_points"] = int(len(y_true_holdout))
                 metrics.append(row)
             except Exception as exc:
                 elapsed = time.perf_counter() - started
                 self.logger.exception("Synthetic validation failed BIM=%s target=%s model=%s", group, target, model.name)
                 row = self._status_row(group, target, model.category, model.name, "failed", elapsed, str(exc))
-                row["validation_mode"] = "synthetic_full_cycle"
-                row["train_source"] = "synthetic_growth_cycles"
+                row["validation_mode"] = "TSTR_temporal_holdout"
+                row["train_source"] = "synthetic_growth_cycles_from_real_train"
+                row["real_train_points"] = int(len(train))
+                row["real_test_points"] = int(len(y_true_holdout))
                 metrics.append(row)
                 if not self.config.get("execution.continue_on_error", True):
                     raise
@@ -234,21 +251,26 @@ class ForecastRunner:
         strategy = str(self.config.get("validation.strategy", "") or "").strip().lower()
         return bool(self.config.get("synthetic_training.enabled", False)) or strategy == "synthetic_full_cycle"
 
-    def _synthetic_cycles_for_target(self, df: pd.DataFrame, target: str) -> pd.DataFrame:
-        if target in self._synthetic_cache:
-            return self._synthetic_cache[target]
-        valid = df.dropna(subset=[target, self.schema.date_col]).copy()
-        group_lengths = valid.groupby(self.schema.group_col, dropna=False)[target].count().tolist()
-        synthetic = self.synthetic_generator.generate(valid[target], group_lengths, target)
-        self._synthetic_cache[target] = synthetic
+    def _synthetic_cycles_for_training_segment(self, train_frame: pd.DataFrame, target: str, group: str) -> pd.DataFrame:
+        valid = train_frame.dropna(subset=[target, self.schema.date_col]).copy()
+        synthetic = self.synthetic_generator.generate(valid[target], [len(valid)], target)
         if self.config.get("synthetic_training.save_dataset", True):
             processed_dir = self.output_dirs["processed"]
             processed_dir.mkdir(parents=True, exist_ok=True)
-            suffix = safe_name(target)
-            path = processed_dir / f"synthetic_growth_cycles_{suffix}.csv"
+            suffix = f"{safe_name(group)}_{safe_name(target)}"
+            path = processed_dir / f"synthetic_growth_cycles_train_{suffix}.csv"
             synthetic.to_csv(path, index=False, encoding="utf-8-sig")
-            self.logger.info("Synthetic growth cycles saved for target=%s path=%s rows=%d", target, path, len(synthetic))
+            self.logger.info("Synthetic growth cycles saved for BIM=%s target=%s path=%s rows=%d", group, target, path, len(synthetic))
         return synthetic
+
+    def _save_synthetic_quality(self, group: str, target: str, train: pd.Series, synthetic_cycles: pd.DataFrame) -> None:
+        result = evaluate_synthetic_cycles(train, synthetic_cycles, target=target, group=group)
+        diagnostics_dir = self.output_dirs["diagnostics"] / "synthetic_quality"
+        diagnostics_dir.mkdir(parents=True, exist_ok=True)
+        suffix = f"{safe_name(group)}_{safe_name(target)}"
+        result.summary.to_csv(diagnostics_dir / f"quality_{suffix}.csv", index=False, encoding="utf-8-sig")
+        if not result.by_phase.empty:
+            result.by_phase.to_csv(diagnostics_dir / f"phase_profile_{suffix}.csv", index=False, encoding="utf-8-sig")
 
     def _build_registry(self) -> list[ForecastModel]:
         enabled = self.config.get("models.enabled_groups", {})

@@ -8,9 +8,11 @@ import pandas as pd
 from scripts.classification.runner import ClassificationRunner
 from scripts.evaluation.metrics import classification_metrics
 from scripts.evaluation.metrics import regression_metrics
+from scripts.forecasting.runner import ForecastRunner
 from scripts.preprocessing.data_loader import detect_schema
 from scripts.sensitivity.decline_sensitivity import _parse_probabilities, _summarize, _winners
 from scripts.synthetic.growth_cycles import SyntheticGrowthCycleGenerator
+from scripts.synthetic.quality import evaluate_synthetic_cycles
 from scripts.utils.config import ProjectConfig, DEFAULT_CONFIG
 
 
@@ -112,6 +114,66 @@ def test_synthetic_growth_cycles_are_complete() -> None:
     assert cycles.groupby("cycle_id").size().between(9, 12).all()
     assert {"lag", "exponential"}.issubset(set(cycles["phase"]))
     assert (cycles["value"] > 0).all()
+
+
+def test_synthetic_quality_reports_distribution_guardrails() -> None:
+    raw = deepcopy(DEFAULT_CONFIG)
+    raw["synthetic_training"]["n_cycles"] = 4
+    raw["synthetic_training"]["min_cycle_points"] = 6
+    raw["synthetic_training"]["max_cycle_points"] = 8
+    config = ProjectConfig(raw=raw, root=Path("."))
+    real = pd.Series([0.25, 0.31, 0.44, 0.56, 0.62, 0.58])
+    cycles = SyntheticGrowthCycleGenerator(config).generate(real, [len(real)], target="OD")
+
+    result = evaluate_synthetic_cycles(real, cycles, target="OD", group="BIM-TEST")
+
+    assert not result.summary.empty
+    assert result.summary.iloc[0]["status"] == "ok"
+    assert "ks_value" in result.summary.columns
+    assert not result.by_phase.empty
+
+
+def test_synthetic_forecast_uses_real_train_holdout_protocol(tmp_path: Path) -> None:
+    n = 14
+    df = pd.DataFrame(
+        {
+            "Fecha": pd.date_range("2026-01-01", periods=n),
+            "BIM": ["BIM-1"] * n,
+            "OD": [0.2, 0.24, 0.31, 0.39, 0.51, 0.62, 0.70, 0.74, 0.73, 0.69, 0.64, 0.58, 0.53, 0.49],
+        }
+    )
+    raw = deepcopy(DEFAULT_CONFIG)
+    raw["execution"]["forecast_horizon"] = 3
+    raw["execution"]["min_train_points"] = 6
+    raw["execution"]["save_models"] = False
+    raw["execution"]["make_png"] = False
+    raw["execution"]["make_svg"] = False
+    raw["synthetic_training"]["enabled"] = True
+    raw["synthetic_training"]["n_cycles"] = 8
+    raw["models"]["enabled_groups"] = {key: False for key in raw["models"]["enabled_groups"]}
+    raw["models"]["enabled_groups"]["machine_learning"] = True
+    raw["model_hyperparameters"]["machine_learning"]["Linear_Regression"]["lags"] = 2
+    config = ProjectConfig(raw=raw, root=tmp_path)
+    schema = detect_schema(df, config, __import__("logging").getLogger("test"))
+    dirs = {
+        "metrics": tmp_path / "outputs" / "metrics",
+        "forecasts": tmp_path / "outputs" / "forecasts",
+        "processed": tmp_path / "outputs" / "processed",
+        "diagnostics": tmp_path / "outputs" / "diagnostics",
+        "models": tmp_path / "outputs" / "models",
+        "figures": tmp_path / "outputs" / "figures",
+        "shap": tmp_path / "outputs" / "shap",
+    }
+
+    metrics, forecasts = ForecastRunner(config, schema, dirs, __import__("logging").getLogger("test")).run(df)
+
+    assert not metrics.empty
+    assert set(metrics["validation_mode"].dropna()) == {"TSTR_temporal_holdout"}
+    assert int(metrics.iloc[0]["real_train_points"]) == n - 3
+    assert int(metrics.iloc[0]["real_test_points"]) == 3
+    if metrics["status"].eq("ok").any():
+        assert not forecasts.empty
+    assert (dirs["diagnostics"] / "synthetic_quality").exists()
 
 
 def test_decline_sensitivity_summary_selects_best_probability() -> None:

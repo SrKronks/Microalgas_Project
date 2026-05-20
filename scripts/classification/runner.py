@@ -37,14 +37,18 @@ class ClassificationRunner:
         prediction_rows: list[dict[str, Any]] = []
         confusion_rows: list[dict[str, Any]] = []
         feature_rows: list[dict[str, Any]] = []
+        class_report_rows: list[dict[str, Any]] = []
+        calibration_rows: list[dict[str, Any]] = []
 
         for label_col in self.schema.label_columns:
             try:
-                metrics, predictions, confusion, features = self._run_label(df, label_col)
+                metrics, predictions, confusion, features, class_reports, calibration = self._run_label(df, label_col)
                 metric_rows.extend(metrics)
                 prediction_rows.extend(predictions)
                 confusion_rows.extend(confusion)
                 feature_rows.extend(features)
+                class_report_rows.extend(class_reports)
+                calibration_rows.extend(calibration)
             except Exception as exc:
                 self.logger.exception("Classification failed for label=%s", label_col)
                 metric_rows.append(self._status_row(label_col, "pipeline", "failed", 0.0, str(exc)))
@@ -55,6 +59,8 @@ class ClassificationRunner:
         predictions_df = pd.DataFrame(prediction_rows)
         confusion_df = pd.DataFrame(confusion_rows)
         feature_importance_df = pd.DataFrame(feature_rows)
+        class_report_df = pd.DataFrame(class_report_rows)
+        calibration_df = pd.DataFrame(calibration_rows)
         rankings_df = rank_classifiers(metrics_df)
 
         metrics_dir = self.output_dirs["metrics"]
@@ -68,6 +74,8 @@ class ClassificationRunner:
         predictions_df.to_csv(metrics_dir / "classification_predictions.csv", index=False, encoding="utf-8-sig")
         confusion_df.to_csv(diagnostics_dir / "classification_confusion_matrices.csv", index=False, encoding="utf-8-sig")
         feature_importance_df.to_csv(diagnostics_dir / "classification_feature_importance.csv", index=False, encoding="utf-8-sig")
+        class_report_df.to_csv(diagnostics_dir / "classification_per_class_metrics.csv", index=False, encoding="utf-8-sig")
+        calibration_df.to_csv(diagnostics_dir / "classification_confidence_calibration.csv", index=False, encoding="utf-8-sig")
         self.logger.info("Classification metrics saved for labels=%s", self.schema.label_columns)
         return metrics_df, rankings_df, predictions_df, confusion_df
 
@@ -75,19 +83,19 @@ class ClassificationRunner:
         self,
         df: pd.DataFrame,
         label_col: str,
-    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         prepared = self._prepare_dataset(df, label_col)
         if prepared.empty:
-            return [self._status_row(label_col, "all", "skipped", 0.0, "no valid labelled rows")], [], [], []
+            return [self._status_row(label_col, "all", "skipped", 0.0, "no valid labelled rows")], [], [], [], [], []
 
         y = prepared[label_col].astype(str)
         class_counts = y.value_counts()
         min_samples = int(self.config.get("classification.min_samples", 20))
         min_class_count = int(self.config.get("classification.min_class_count", 2))
         if len(prepared) < min_samples:
-            return [self._status_row(label_col, "all", "skipped", 0.0, f"requires at least {min_samples} labelled samples")], [], [], []
+            return [self._status_row(label_col, "all", "skipped", 0.0, f"requires at least {min_samples} labelled samples")], [], [], [], [], []
         if class_counts.min() < min_class_count:
-            return [self._status_row(label_col, "all", "skipped", 0.0, f"each class requires at least {min_class_count} samples")], [], [], []
+            return [self._status_row(label_col, "all", "skipped", 0.0, f"each class requires at least {min_class_count} samples")], [], [], [], [], []
 
         feature_cols = [col for col in prepared.columns if col not in {label_col, self.schema.date_col, self.schema.group_col, "_row_id"}]
         x = prepared[feature_cols].copy()
@@ -100,6 +108,8 @@ class ClassificationRunner:
         prediction_rows: list[dict[str, Any]] = []
         confusion_rows: list[dict[str, Any]] = []
         feature_rows: list[dict[str, Any]] = []
+        class_report_rows: list[dict[str, Any]] = []
+        calibration_rows: list[dict[str, Any]] = []
 
         for model_name, estimator in self._models():
             started = time.perf_counter()
@@ -130,9 +140,13 @@ class ClassificationRunner:
                         model_name,
                         y.iloc[test_idx].reset_index(drop=True),
                         y_pred.reset_index(drop=True),
+                        labels,
+                        y_proba,
                     )
                 )
                 matrix = _confusion_matrix(y.iloc[test_idx], y_pred, labels)
+                class_report_rows.extend(_per_class_rows(label_col, model_name, matrix, labels))
+                calibration_rows.extend(_confidence_bins(label_col, model_name, y.iloc[test_idx].reset_index(drop=True), y_pred.reset_index(drop=True), y_proba, labels))
                 for true_idx, true_label in enumerate(labels):
                     for pred_idx, pred_label in enumerate(labels):
                         confusion_rows.append(
@@ -153,7 +167,7 @@ class ClassificationRunner:
                 if not self.config.get("execution.continue_on_error", True):
                     raise
 
-        return metric_rows, prediction_rows, confusion_rows, feature_rows
+        return metric_rows, prediction_rows, confusion_rows, feature_rows, class_report_rows, calibration_rows
 
     def _prepare_dataset(self, df: pd.DataFrame, label_col: str) -> pd.DataFrame:
         working = df.copy()
@@ -274,9 +288,20 @@ class ClassificationRunner:
         model_name: str,
         y_true: pd.Series,
         y_pred: pd.Series,
+        labels: list[str],
+        y_proba: Any | None,
     ) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
+        proba = np.asarray(y_proba, dtype=float) if y_proba is not None else None
+        confidence_threshold = float(self.config.get("classification.confidence_threshold", 0.65))
         for idx, (_, row) in enumerate(frame.reset_index(drop=True).iterrows()):
+            confidence = float(np.nanmax(proba[idx])) if proba is not None and len(proba) > idx else np.nan
+            true_probability = np.nan
+            probability_json = None
+            if proba is not None and len(proba) > idx:
+                probability_map = {label: float(proba[idx, label_idx]) for label_idx, label in enumerate(labels) if label_idx < proba.shape[1]}
+                probability_json = json.dumps(probability_map, ensure_ascii=False)
+                true_probability = float(probability_map.get(str(y_true.iloc[idx]), np.nan))
             rows.append(
                 {
                     "label_target": label_col,
@@ -287,6 +312,10 @@ class ClassificationRunner:
                     "y_true": y_true.iloc[idx],
                     "y_pred": y_pred.iloc[idx],
                     "correct": bool(y_true.iloc[idx] == y_pred.iloc[idx]),
+                    "confidence": confidence,
+                    "true_label_probability": true_probability,
+                    "low_confidence": bool(np.isfinite(confidence) and confidence < confidence_threshold),
+                    "class_probabilities": probability_json,
                 }
             )
         return rows
@@ -351,6 +380,76 @@ class ClassificationRunner:
         ]:
             row.setdefault(metric, np.nan)
         return row
+
+
+def _per_class_rows(label_col: str, model_name: str, matrix: np.ndarray, labels: list[str]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    total = max(int(matrix.sum()), 1)
+    for idx, label in enumerate(labels):
+        tp = float(matrix[idx, idx])
+        fp = float(matrix[:, idx].sum() - tp)
+        fn = float(matrix[idx, :].sum() - tp)
+        support = float(matrix[idx, :].sum())
+        precision = tp / (tp + fp) if (tp + fp) else 0.0
+        recall = tp / (tp + fn) if (tp + fn) else 0.0
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+        rows.append(
+            {
+                "label_target": label_col,
+                "model": model_name,
+                "class_label": label,
+                "support": int(support),
+                "support_pct": float(100.0 * support / total),
+                "precision": float(precision),
+                "recall": float(recall),
+                "f1": float(f1),
+            }
+        )
+    return rows
+
+
+def _confidence_bins(
+    label_col: str,
+    model_name: str,
+    y_true: pd.Series,
+    y_pred: pd.Series,
+    y_proba: Any | None,
+    labels: list[str],
+) -> list[dict[str, Any]]:
+    if y_proba is None:
+        return []
+    proba = np.asarray(y_proba, dtype=float)
+    if proba.ndim != 2 or len(proba) == 0:
+        return []
+    confidence = np.nanmax(proba, axis=1)
+    correct = y_true.astype(str).to_numpy() == y_pred.astype(str).to_numpy()
+    true_prob = []
+    label_to_idx = {label: idx for idx, label in enumerate(labels)}
+    for idx, true_label in enumerate(y_true.astype(str)):
+        class_idx = label_to_idx.get(true_label)
+        true_prob.append(float(proba[idx, class_idx]) if class_idx is not None and class_idx < proba.shape[1] else np.nan)
+
+    rows: list[dict[str, Any]] = []
+    bins = np.linspace(0.0, 1.0, 6)
+    for left, right in zip(bins[:-1], bins[1:]):
+        if right >= 1.0:
+            mask = (confidence >= left) & (confidence <= right)
+        else:
+            mask = (confidence >= left) & (confidence < right)
+        if not np.any(mask):
+            continue
+        rows.append(
+            {
+                "label_target": label_col,
+                "model": model_name,
+                "confidence_bin": f"{left:.1f}-{right:.1f}",
+                "n": int(np.sum(mask)),
+                "mean_confidence": float(np.mean(confidence[mask])),
+                "accuracy": float(np.mean(correct[mask])),
+                "mean_true_label_probability": float(np.nanmean(np.asarray(true_prob, dtype=float)[mask])),
+            }
+        )
+    return rows
 
 
 def _confusion_matrix(y_true: pd.Series, y_pred: pd.Series, labels: list[str]) -> np.ndarray:

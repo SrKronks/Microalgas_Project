@@ -20,10 +20,12 @@ DEFAULT_GRID = (
     "machine_learning.Ridge.alpha=0.1,1.0,10.0;"
     "machine_learning.Lasso.alpha=0.0001,0.001,0.01;"
     "machine_learning.Elastic_Net.l1_ratio=0.2,0.5,0.8;"
+    "machine_learning.Elastic_Net.alpha=0.0001,0.001,0.01;"
     "machine_learning.Random_Forest.n_estimators=100,200,400;"
     "machine_learning.Random_Forest.lags=2,3,5;"
     "machine_learning.SVR.C=1.0,10.0,50.0;"
     "probabilistic.Monte_Carlo.simulations=200,500,1000;"
+    "synthetic_training.noise_fraction=0.01,0.03,0.05,0.10;"
     "synthetic_training.decline_probability=0.4,0.7,0.9"
 )
 

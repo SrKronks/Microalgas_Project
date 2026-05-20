@@ -35,13 +35,26 @@ class ReportBuilder:
         classification_rankings = classification_rankings if classification_rankings is not None else pd.DataFrame()
         classification_predictions = classification_predictions if classification_predictions is not None else pd.DataFrame()
         classification_confusion = classification_confusion if classification_confusion is not None else pd.DataFrame()
+        synthetic_quality = self._load_synthetic_quality()
+        sensitivity_plan = self._sensitivity_plan()
         reports_dir = self.output_dirs["reports"]
         reports_dir.mkdir(parents=True, exist_ok=True)
         artifacts: dict[str, Path] = {}
         if self.config.get("reporting.export_html", True):
             html_path = reports_dir / "microalgas_report.html"
             html_path.write_text(
-                self._html(dataset_summary, dependency_summary, quality, descriptive, metrics, rankings, classification_metrics, classification_rankings),
+                self._html(
+                    dataset_summary,
+                    dependency_summary,
+                    quality,
+                    descriptive,
+                    metrics,
+                    rankings,
+                    classification_metrics,
+                    classification_rankings,
+                    synthetic_quality,
+                    sensitivity_plan,
+                ),
                 encoding="utf-8",
             )
             dashboard_path = reports_dir / "dashboard_summary.html"
@@ -63,6 +76,8 @@ class ReportBuilder:
                 classification_rankings,
                 classification_predictions,
                 classification_confusion,
+                synthetic_quality,
+                sensitivity_plan,
             )
             artifacts["excel"] = excel_path
         if self.config.get("reporting.export_pdf", True) and self.config.get("execution.make_pdf", True):
@@ -82,6 +97,8 @@ class ReportBuilder:
         rankings: pd.DataFrame,
         classification_metrics: pd.DataFrame,
         classification_rankings: pd.DataFrame,
+        synthetic_quality: pd.DataFrame,
+        sensitivity_plan: pd.DataFrame,
     ) -> str:
         title = self.config.get("reporting.title", "Microalgae report")
         best = rankings.head(20) if not rankings.empty else pd.DataFrame()
@@ -137,6 +154,13 @@ class ReportBuilder:
   {_df_table(classification_metrics)}
   <h2>Top clasificadores</h2>
   {_df_table(classification_rankings.head(20))}
+  <h2>Calidad de datos sinteticos</h2>
+  {_df_table(synthetic_quality.head(80))}
+  <h2>Analisis de sensibilidad recomendado</h2>
+  {_df_table(sensitivity_plan)}
+  <h2>Lectura metodologica</h2>
+  <p>Los ciclos sinteticos se generan desde el tramo real de entrenamiento de cada BIM y se evaluan contra un holdout temporal real. Esto reduce fuga de informacion y permite interpretar el protocolo como TSTR temporal: entrenar con sintetico y probar en real.</p>
+  <p>Para clasificacion se priorizan Macro F1 y Balanced Accuracy. Las probabilidades guardadas en <code>Class_Predictions</code> permiten filtrar casos de baja confianza y usarlas como contexto para regresion.</p>
 </body>
 </html>"""
 
@@ -186,6 +210,8 @@ class ReportBuilder:
         classification_rankings: pd.DataFrame,
         classification_predictions: pd.DataFrame,
         classification_confusion: pd.DataFrame,
+        synthetic_quality: pd.DataFrame,
+        sensitivity_plan: pd.DataFrame,
     ) -> None:
         with pd.ExcelWriter(path, engine="openpyxl") as writer:
             dataset_rows = [{"key": key, "value": _cell_value(value)} for key, value in dataset_summary.items()]
@@ -201,6 +227,42 @@ class ReportBuilder:
             classification_rankings.to_excel(writer, sheet_name="Class_Rankings", index=False)
             classification_predictions.head(100_000).to_excel(writer, sheet_name="Class_Predictions", index=False)
             classification_confusion.to_excel(writer, sheet_name="Class_Confusion", index=False)
+            synthetic_quality.to_excel(writer, sheet_name="Synthetic_Quality", index=False)
+            sensitivity_plan.to_excel(writer, sheet_name="Sensitivity_Plan", index=False)
+
+    def _load_synthetic_quality(self) -> pd.DataFrame:
+        diagnostics_dir = self.output_dirs.get("diagnostics")
+        if diagnostics_dir is None:
+            return pd.DataFrame()
+        quality_dir = diagnostics_dir / "synthetic_quality"
+        if not quality_dir.exists():
+            return pd.DataFrame()
+        frames = []
+        for path in sorted(quality_dir.glob("quality_*.csv")):
+            try:
+                frames.append(pd.read_csv(path))
+            except Exception as exc:
+                self.logger.debug("Could not read synthetic quality file %s: %s", path, exc)
+        return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+    def _sensitivity_plan(self) -> pd.DataFrame:
+        grid = self.config.get("sensitivity.default_grid", {}) or {}
+        rows = []
+        for key, values in grid.items():
+            rows.append(
+                {
+                    "parameter": key,
+                    "values": ", ".join(map(str, values if isinstance(values, list) else [values])),
+                    "purpose": _sensitivity_purpose(str(key)),
+                }
+            )
+        if not rows:
+            rows = [
+                {"parameter": "synthetic_training.noise_fraction", "values": "0.01, 0.03, 0.05, 0.10", "purpose": "Realismo de los sinteticos"},
+                {"parameter": "synthetic_training.decline_probability", "values": "0.40, 0.70, 0.90", "purpose": "Sensibilidad a fase de declive"},
+                {"parameter": "classification.confidence_threshold", "values": "0.50, 0.65, 0.80", "purpose": "Cobertura vs precision de clasificadores"},
+            ]
+        return pd.DataFrame(rows)
 
     def _pdf(self, path: Path, dataset_summary: dict[str, Any], metrics: pd.DataFrame, rankings: pd.DataFrame) -> bool:
         try:
@@ -292,6 +354,22 @@ def _dict_table(data: dict[str, Any]) -> str:
         return "<p>No hay datos disponibles.</p>"
     rows = [{"key": key, "value": json.dumps(value, ensure_ascii=False) if isinstance(value, (dict, list)) else value} for key, value in data.items()]
     return _df_table(pd.DataFrame(rows))
+
+
+def _sensitivity_purpose(key: str) -> str:
+    if "noise_fraction" in key:
+        return "Evalua si el ruido sintetico mejora generalizacion o crea ciclos irreales."
+    if "decline_probability" in key:
+        return "Mide sensibilidad a la presencia de fase de declive en ciclos sinteticos."
+    if "n_estimators" in key:
+        return "Contrasta estabilidad y costo de ensembles."
+    if "lags" in key:
+        return "Evalua cuanta memoria temporal necesita el modelo."
+    if "alpha" in key:
+        return "Mide regularizacion y control de sobreajuste."
+    if "l1_ratio" in key:
+        return "Balancea seleccion de variables y estabilidad del Elastic Net."
+    return "Parametro incluido en el barrido de sensibilidad."
 
 
 def _cell_value(value: Any) -> Any:
