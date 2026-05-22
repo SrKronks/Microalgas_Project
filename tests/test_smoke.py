@@ -113,6 +113,7 @@ def test_synthetic_growth_cycles_are_complete() -> None:
     assert cycles["cycle_id"].nunique() == 6
     assert cycles.groupby("cycle_id").size().between(9, 12).all()
     assert {"lag", "exponential"}.issubset(set(cycles["phase"]))
+    assert {"BIM", "cycle_age_days", "specific_growth_rate", "synthetic_ritmo", "synthetic_estado_cultivo", "optimality_score", "pH", "EC", "Temperatura (°C)"}.issubset(cycles.columns)
     assert (cycles["value"] > 0).all()
 
 
@@ -195,6 +196,8 @@ def test_synthetic_forecast_uses_real_train_holdout_protocol(tmp_path: Path) -> 
     assert int(metrics.iloc[0]["real_test_points"]) == 3
     if metrics["status"].eq("ok").any():
         assert not forecasts.empty
+        metadata = metrics.loc[metrics["status"].eq("ok"), "metadata"].dropna().iloc[0]
+        assert "phase_conditioned_one_step_ahead" in metadata
     assert (dirs["diagnostics"] / "synthetic_quality").exists()
 
 

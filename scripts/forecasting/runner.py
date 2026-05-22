@@ -253,7 +253,13 @@ class ForecastRunner:
 
     def _synthetic_cycles_for_training_segment(self, train_frame: pd.DataFrame, target: str, group: str) -> pd.DataFrame:
         valid = train_frame.dropna(subset=[target, self.schema.date_col]).copy()
-        synthetic = self.synthetic_generator.generate(valid[target], [len(valid)], target)
+        synthetic = self.synthetic_generator.generate(
+            valid[target],
+            [len(valid)],
+            target,
+            group=group,
+            observed_frame=valid,
+        )
         if self.config.get("synthetic_training.save_dataset", True):
             processed_dir = self.output_dirs["processed"]
             processed_dir.mkdir(parents=True, exist_ok=True)

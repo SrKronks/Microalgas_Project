@@ -49,8 +49,9 @@ validation:
 synthetic_training:
   enabled: true
   n_cycles: 2000
-  min_cycle_points: 8
-  max_cycle_points: 32
+  min_cycle_points: 48
+  max_cycle_points: 96
+  sampling_interval_days: 0.25
   ratios_to_evaluate:
     - 0
     - 1
@@ -172,6 +173,9 @@ model_hyperparameters:
     Sequential_Monte_Carlo:
       particles: 500
   machine_learning:
+    phase_aware:
+      phase_aware: true
+      min_phase_samples: 80
     Linear_Regression:
       lags: 3
     Polynomial_Regression:

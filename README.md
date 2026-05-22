@@ -1,16 +1,18 @@
 # Microalgas Project
 
-Proyecto profesional de ciencia de datos para analisis, modelado y pronostico
-del crecimiento de microalgas por BIM-ID a partir de archivos Excel.
+Proyecto profesional de ciencia de datos para analisis, modelado, clasificacion
+de estado y pronostico por fases del crecimiento de microalgas por BIM-ID a
+partir de archivos Excel.
 
 El pipeline detecta columnas temporales, variables numericas, BIM/grupo,
 calidad de datos, estadistica descriptiva, diagnosticos temporales,
 analisis multivariado, entrenamiento de modelos, ranking y reportes
 automaticos.
 
-Si el dataset incluye etiquetas categoricas como `Ritmo` y
-`Estado_Cultivo`, el pipeline tambien entrena clasificadores para esas
-etiquetas y genera metricas especificas de clasificacion.
+El foco principal es apoyar el diagnostico y la alerta operacional del cultivo
+mediante etiquetas como `Ritmo` y `Estado_Cultivo`. Los modelos continuos de
+OD/pH/EC quedan como soporte para estimar tendencia y comportamiento dentro de
+cada fase biologica del ciclo.
 
 ## Estructura
 
@@ -176,12 +178,23 @@ con rezagos observados.
 
 La configuracion esta en `synthetic_training`:
 
-- `n_cycles`: cantidad de ciclos sinteticos, por defecto 2000
-- `min_cycle_points` / `max_cycle_points`: largo de cada ciclo
+- `n_cycles`: cantidad de ciclos sinteticos independientes por BIM, por defecto 2000
+- `min_cycle_points` / `max_cycle_points`: largo de cada ciclo, por defecto 48 a 96 puntos
+- `sampling_interval_days`: resolucion temporal sintetica, por defecto 0.25 dias
 - `noise_fraction`: ruido de medicion autocorrelacionado
 - `decline_probability`: probabilidad de fase de declive
 - `seasonality_probability`: oscilacion suave en fase madura
 - `save_dataset`: guarda `data/processed/synthetic_growth_cycles_<target>.csv`
+
+Cada ciclo sintetico incluye fase (`lag`, `exponential`, `stationary`,
+`decline`), edad del ciclo, tiempo relativo, valor normalizado, delta,
+tasa de crecimiento especifica, pH/EC/temperatura simulados, etiquetas
+operativas sinteticas y un puntaje de optimalidad.
+
+Los modelos supervisados compatibles entrenan un modelo global y submodelos por
+fase. Durante la validacion se infiere la fase del segmento real y cada punto se
+predice con el submodelo de su fase; si una fase no tiene suficientes muestras,
+se usa el modelo global como respaldo.
 
 Los modelos que aun no implementan entrenamiento desde ciclos sinteticos quedan
 marcados como `skipped` en ese modo, para evitar metricas optimistas o

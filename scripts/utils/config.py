@@ -46,8 +46,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "synthetic_training": {
         "enabled": True,
         "n_cycles": 2000,
-        "min_cycle_points": 8,
-        "max_cycle_points": 32,
+        "min_cycle_points": 48,
+        "max_cycle_points": 96,
+        "sampling_interval_days": 0.25,
         "ratios_to_evaluate": [0, 1, 2, 5, 10],
         "noise_fraction": 0.035,
         "noise_fraction_grid": [0.01, 0.03, 0.05, 0.10],
@@ -126,6 +127,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
             "Sequential_Monte_Carlo": {"particles": 500},
         },
         "machine_learning": {
+            "phase_aware": {"phase_aware": True, "min_phase_samples": 80},
             "Linear_Regression": {"lags": 3},
             "Polynomial_Regression": {"lags": 3, "degree": 2},
             "Ridge": {"lags": 3, "alpha": 1.0},
