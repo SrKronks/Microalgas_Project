@@ -116,6 +116,28 @@ def test_synthetic_growth_cycles_are_complete() -> None:
     assert (cycles["value"] > 0).all()
 
 
+def test_synthetic_growth_cycles_repair_tight_carrying_bounds() -> None:
+    raw = deepcopy(DEFAULT_CONFIG)
+    raw["synthetic_training"]["n_cycles"] = 8
+    raw["synthetic_training"]["min_cycle_points"] = 6
+    raw["synthetic_training"]["max_cycle_points"] = 8
+    raw["synthetic_training"]["baseline_low"] = 0.7
+    raw["synthetic_training"]["baseline_high"] = 1.0
+    raw["synthetic_training"]["carrying_low"] = 0.8
+    raw["synthetic_training"]["carrying_high"] = 0.9
+    config = ProjectConfig(raw=raw, root=Path("."))
+
+    cycles = SyntheticGrowthCycleGenerator(config).generate(
+        observed_values=pd.Series([0.62, 0.64, 0.66, 0.65, 0.63]),
+        observed_lengths=[6],
+        target="OD",
+    )
+
+    params = cycles.groupby("cycle_id")[["baseline", "carrying_capacity"]].first()
+    assert cycles["cycle_id"].nunique() == 8
+    assert (params["carrying_capacity"] >= params["baseline"] * 1.2).all()
+
+
 def test_synthetic_quality_reports_distribution_guardrails() -> None:
     raw = deepcopy(DEFAULT_CONFIG)
     raw["synthetic_training"]["n_cycles"] = 4

@@ -87,6 +87,7 @@ class SyntheticGrowthCycleGenerator:
         baseline_high = max(baseline_low * 1.05, float(_cfg(self.config, "synthetic_training.baseline_high", max(q25, q50 - 0.15 * spread))))
         carrying_low = max(baseline_high * 1.05, float(_cfg(self.config, "synthetic_training.carrying_low", max(q75, q50 + 0.30 * spread))))
         carrying_high = max(carrying_low * 1.05, float(_cfg(self.config, "synthetic_training.carrying_high", q95 + 0.80 * spread)))
+        carrying_high = max(carrying_high, baseline_high * 1.2 * 1.05)
 
         return SyntheticGrowthProfile(
             n_cycles=max(1, int(_cfg(self.config, "synthetic_training.n_cycles", 2000))),
@@ -110,7 +111,9 @@ def _simulate_cycle(
 ) -> tuple[np.ndarray, dict[str, float], list[str]]:
     t = np.linspace(0.0, 1.0, length)
     baseline = float(rng.uniform(profile.baseline_low, profile.baseline_high))
-    carrying_capacity = float(rng.uniform(max(profile.carrying_low, baseline * 1.2), profile.carrying_high))
+    carrying_floor = max(profile.carrying_low, baseline * 1.2)
+    carrying_ceiling = max(profile.carrying_high, carrying_floor * 1.05)
+    carrying_capacity = float(rng.uniform(carrying_floor, carrying_ceiling))
     amplitude = max(carrying_capacity - baseline, 1e-6)
     lag_fraction = float(rng.uniform(0.04, 0.28))
     midpoint = float(rng.uniform(lag_fraction + 0.10, min(0.72, lag_fraction + 0.42)))
